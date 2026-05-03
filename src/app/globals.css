@@ -9,14 +9,14 @@
 [data-theme="bw"] {
     --c-bg: #000000;
     --c-primary: #ffffff;
-    --c-secondary: #bbbbbb;
-    --c-muted: #666666;
-    --c-border: #444444;
+    --c-secondary: #dddddd;
+    --c-muted: #aaaaaa;
+    --c-border: #777777;
     --c-pink: #ffffff;
-    --c-cyan: #cccccc;
+    --c-cyan: #eeeeee;
     --c-yellow: #ffffff;
     --c-red: #ffffff;
-    --c-dim: #333333;
+    --c-dim: #777777;
     --c-glow-primary: none;
     --c-glow-pink: none;
     --c-glow-cyan: none;
