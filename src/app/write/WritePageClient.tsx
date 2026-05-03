@@ -6,7 +6,11 @@ import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { CoinBalance } from "@/components/CoinBalance";
 
-const POST_COST = 10;
+const POST_COST_PER_CHAR = 1;
+
+function calcPostCost(title: string, content: string): number {
+  return (title.trim().length + content.trim().length) * POST_COST_PER_CHAR;
+}
 
 interface WritePageClientProps {
   userCoins: number;
@@ -21,7 +25,8 @@ export function WritePageClient({ userCoins, username }: WritePageClientProps) {
   const router = useRouter();
   const { toast } = useToast();
 
-  const canAfford = currentCoins >= POST_COST;
+  const cost = calcPostCost(title, content);
+  const canAfford = currentCoins >= cost;
   const isValid =
     title.trim().length >= 1 &&
     title.trim().length <= 200 &&
@@ -52,7 +57,7 @@ export function WritePageClient({ userCoins, username }: WritePageClientProps) {
 
       toast({
         title: "// published",
-        description: "¢ 10 deducted. your words are now in the void.",
+        description: `¢ ${data.post.coin_cost} deducted. your words are now in the void.`,
       });
       setCurrentCoins(data.newBalance);
       router.push(`/post/${data.post.id}`);
@@ -138,7 +143,7 @@ export function WritePageClient({ userCoins, username }: WritePageClientProps) {
               textShadow: "0 0 6px rgba(255,230,0,0.4)",
             }}
           >
-            ¢ 10
+            ¢ 1 per character
           </span>{" "}
           — make them count.
         </p>
@@ -160,7 +165,7 @@ export function WritePageClient({ userCoins, username }: WritePageClientProps) {
             ! insufficient coins
           </p>
           <p className="text-xs mt-1" style={{ color: "#003b0f" }}>
-            you need at least ¢ 10. current balance: {currentCoins}
+            you need at least ¢{cost}. current balance: {currentCoins}
           </p>
         </div>
       )}
@@ -230,13 +235,12 @@ export function WritePageClient({ userCoins, username }: WritePageClientProps) {
         {/* Footer */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-3 text-xs">
+            <span style={{ color: "#003b0f" }}>cost:</span>
+            <CoinBalance balance={cost} size="sm" />
             <span style={{ color: "#003b0f" }}>balance:</span>
             <CoinBalance balance={currentCoins} size="sm" />
             <span style={{ color: "#003b0f" }}>→</span>
-            <CoinBalance
-              balance={Math.max(0, currentCoins - POST_COST)}
-              size="sm"
-            />
+            <CoinBalance balance={Math.max(0, currentCoins - cost)} size="sm" />
           </div>
 
           <button
@@ -271,7 +275,7 @@ export function WritePageClient({ userCoins, username }: WritePageClientProps) {
               (e.currentTarget as HTMLButtonElement).style.textShadow = "";
             }}
           >
-            {isSubmitting ? "// transmitting..." : "> publish (¢ 10)"}
+            {isSubmitting ? "// transmitting..." : `> publish (¢ ${cost})`}
           </button>
         </div>
       </form>

@@ -92,22 +92,7 @@ export function Navbar({ user }: NavbarProps) {
           >
             + WRITE
           </Link>
-          <Link
-            href="/hall-of-shame"
-            className="font-mono text-xs uppercase tracking-widest transition-all"
-            style={{ color: "#003b0f" }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.color = "#ff006e";
-              (e.currentTarget as HTMLAnchorElement).style.textShadow =
-                "0 0 8px #ff006e, 0 0 20px #ff006e";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.color = "#003b0f";
-              (e.currentTarget as HTMLAnchorElement).style.textShadow = "";
-            }}
-          >
-            &#9760; SHAME
-          </Link>
+
           {user?.is_admin && (
             <Link
               href="/admin"

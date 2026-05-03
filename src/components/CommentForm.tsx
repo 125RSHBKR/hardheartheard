@@ -11,8 +11,11 @@ interface CommentFormProps {
   required?: boolean;
 }
 
-const COMMENT_COST_DISPLAY = "3.48";
-const COMMENT_COST_ACTUAL = 3;
+const COMMENT_EARN_PER_CHAR = 0.5; // author earns this, commenter pays this
+
+function calcCommentCost(text: string): number {
+  return Math.ceil(text.trim().length * COMMENT_EARN_PER_CHAR);
+}
 
 export function CommentForm({
   postId,
@@ -25,13 +28,14 @@ export function CommentForm({
   const router = useRouter();
   const { toast } = useToast();
 
-  const canAfford = userCoins >= COMMENT_COST_ACTUAL;
+  const cost = calcCommentCost(content);
+  const canAfford = userCoins >= cost;
   const charCount = content.length;
   const isValid = content.trim().length >= 5 && content.trim().length <= 1000;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValid || !canAfford || isSubmitting) return;
+    if (!isValid || !canAfford || isSubmitting || cost === 0) return;
 
     setIsSubmitting(true);
     try {
@@ -54,7 +58,7 @@ export function CommentForm({
 
       toast({
         title: "// response posted",
-        description: `¢ ${COMMENT_COST_DISPLAY} deducted. balance: ${data.newBalance?.toLocaleString() ?? "?"}`,
+        description: `¢ ${data.comment?.coin_cost ?? cost} deducted. balance: ${data.newBalance?.toLocaleString() ?? "?"}`,
       });
       setContent("");
       onSuccess?.(data.newBalance);
@@ -134,7 +138,9 @@ export function CommentForm({
           }}
         >
           {canAfford
-            ? `¢ ${COMMENT_COST_DISPLAY} cost`
+            ? cost > 0
+              ? `¢ ${cost} cost (½¢/char)`
+              : `½¢/char`
             : "! insufficient coins"}
         </span>
 
@@ -166,7 +172,7 @@ export function CommentForm({
             (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
           }}
         >
-          {isSubmitting ? "// transmitting..." : "> post response"}
+          {isSubmitting ? "// transmitting..." : `> post response (¢ ${cost})`}
         </button>
       </div>
     </form>

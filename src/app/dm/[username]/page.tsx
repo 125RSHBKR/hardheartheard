@@ -1,7 +1,7 @@
-import { notFound, redirect } from 'next/navigation';
-import prisma from '@/lib/prisma';
-import { createClient } from '@/lib/supabase/server';
-import { DMPageClient } from './DMPageClient';
+import { notFound, redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+import { createClient } from "@/lib/supabase/server";
+import { DMPageClient } from "./DMPageClient";
 
 interface DMPageProps {
   params: { username: string };
@@ -9,9 +9,11 @@ interface DMPageProps {
 
 export default async function DMPage({ params }: DMPageProps) {
   const supabase = createClient();
-  const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+  const {
+    data: { user: supabaseUser },
+  } = await supabase.auth.getUser();
 
-  if (!supabaseUser) redirect('/');
+  if (!supabaseUser) redirect("/");
 
   const [sender, recipient] = await Promise.all([
     prisma.user.findUnique({
@@ -20,20 +22,21 @@ export default async function DMPage({ params }: DMPageProps) {
     }),
     prisma.user.findUnique({
       where: { username: params.username },
-      select: { id: true, username: true, display_name: true, avatar_url: true, is_banned: true },
+      select: {
+        id: true,
+        username: true,
+        display_name: true,
+        avatar_url: true,
+        is_banned: true,
+      },
     }),
   ]);
 
-  if (!sender) redirect('/');
-  if (sender.is_banned) redirect('/hall-of-shame');
+  if (!sender) redirect("/");
+  if (sender.is_banned) redirect("/");
   if (!recipient) notFound();
   if (recipient.is_banned) notFound();
   if (sender.id === recipient.id) redirect(`/profile/${sender.username}`);
 
-  return (
-    <DMPageClient
-      recipient={recipient}
-      sender={sender}
-    />
-  );
+  return <DMPageClient recipient={recipient} sender={sender} />;
 }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
-import { COIN_COSTS } from "@/lib/coins";
+import { commentCost } from "@/lib/coins";
+import type { Prisma } from ".prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,12 +27,7 @@ export async function POST(req: NextRequest) {
         { error: "Your account is banned" },
         { status: 403 },
       );
-    if (dbUser.coins < COIN_COSTS.COMMENT) {
-      return NextResponse.json(
-        { error: "Insufficient coins. Need at least 3." },
-        { status: 400 },
-      );
-    }
+    // cost computed after we parse the body below
 
     const body = await req.json();
     const { post_id, content } = body;
@@ -51,6 +47,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const cost = commentCost(content.trim().length);
+
+    if (dbUser.coins < cost) {
+      return NextResponse.json(
+        {
+          error: `Insufficient coins. This comment costs ¢ ${cost} (${content.trim().length} chars). You have ¢ ${dbUser.coins}.`,
+        },
+        { status: 400 },
+      );
+    }
+
     // Verify post exists and get author
     const post = await prisma.post.findUnique({
       where: { id: post_id, is_deleted: false },
@@ -63,44 +70,46 @@ export async function POST(req: NextRequest) {
     const payAuthor = post.author_id !== dbUser.id;
 
     // Create comment + move coins atomically
-    const comment = await prisma.$transaction(async (tx) => {
-      // Create the comment
-      const newComment = await tx.comment.create({
-        data: {
-          post_id,
-          author_id: dbUser.id,
-          content: content.trim(),
-          coin_cost: COIN_COSTS.COMMENT,
-        },
-      });
-
-      // Deduct from commenter
-      await tx.user.update({
-        where: { id: dbUser.id },
-        data: { coins: { decrement: COIN_COSTS.COMMENT } },
-      });
-
-      // Pay post author (unless commenting on own post)
-      if (payAuthor) {
-        await tx.user.update({
-          where: { id: post.author_id },
-          data: { coins: { increment: COIN_COSTS.COMMENT } },
+    const comment = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        // Create the comment
+        const newComment = await tx.comment.create({
+          data: {
+            post_id,
+            author_id: dbUser.id,
+            content: content.trim(),
+            coin_cost: cost,
+          },
         });
-      }
 
-      // Record transaction
-      await tx.coinTransaction.create({
-        data: {
-          from_user_id: dbUser.id,
-          to_user_id: payAuthor ? post.author_id : null,
-          amount: COIN_COSTS.COMMENT,
-          type: "COMMENT_COST",
-          reference_id: newComment.id,
-        },
-      });
+        // Deduct from commenter
+        await tx.user.update({
+          where: { id: dbUser.id },
+          data: { coins: { decrement: cost } },
+        });
 
-      return newComment;
-    });
+        // Pay post author (unless commenting on own post)
+        if (payAuthor) {
+          await tx.user.update({
+            where: { id: post.author_id },
+            data: { coins: { increment: cost } },
+          });
+        }
+
+        // Record transaction
+        await tx.coinTransaction.create({
+          data: {
+            from_user_id: dbUser.id,
+            to_user_id: payAuthor ? post.author_id : null,
+            amount: cost,
+            type: "COMMENT_COST",
+            reference_id: newComment.id,
+          },
+        });
+
+        return newComment;
+      },
+    );
 
     // Check if commenter went bankrupt
     const updatedCommenter = await prisma.user.findUnique({

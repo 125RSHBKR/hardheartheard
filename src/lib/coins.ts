@@ -2,9 +2,21 @@ import prisma from "@/lib/prisma";
 import { TransactionType, Prisma } from ".prisma/client";
 
 export const COIN_COSTS = {
-  POST: 10,
-  COMMENT: 3,
+  /** Cost per character when publishing a post (1 coin / char) */
+  POST_PER_CHAR: 1,
+  /** Coins earned by post author per character in a comment (0.5 coins / char) */
+  COMMENT_EARN_PER_CHAR: 0.5,
 } as const;
+
+/** How many coins a post of charCount characters costs */
+export function postCost(charCount: number): number {
+  return Math.ceil(charCount * COIN_COSTS.POST_PER_CHAR);
+}
+
+/** How many coins a commenter pays (author receives) for a comment */
+export function commentCost(charCount: number): number {
+  return Math.ceil(charCount * COIN_COSTS.COMMENT_EARN_PER_CHAR);
+}
 
 export const SPAM_FLAG_THRESHOLD = 5;
 export const SPAM_PUNISHMENT_AMOUNT = 20;
