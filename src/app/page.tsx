@@ -1,13 +1,11 @@
-import React from 'react';
-import Link from 'next/link';
-import prisma from '@/lib/prisma';
-import { PostCard } from '@/components/PostCard';
-import { createClient } from '@/lib/supabase/server';
-import { Button } from '@/components/ui/button';
-import { Flame, Clock, PenLine } from 'lucide-react';
-import type { FeedPost } from '@/types';
+import React from "react";
+import Link from "next/link";
+import prisma from "@/lib/prisma";
+import { PostCard } from "@/components/PostCard";
+import { createClient } from "@/lib/supabase/server";
+import type { FeedPost } from "@/types";
 
-type SortMode = 'recent' | 'trending';
+type SortMode = "recent" | "trending";
 
 interface FeedPageProps {
   searchParams: { sort?: string };
@@ -17,9 +15,9 @@ async function getPosts(sort: SortMode): Promise<FeedPost[]> {
   const posts = await prisma.post.findMany({
     where: { is_deleted: false },
     orderBy:
-      sort === 'trending'
-        ? [{ comments: { _count: 'desc' } }, { created_at: 'desc' }]
-        : { created_at: 'desc' },
+      sort === "trending"
+        ? [{ comments: { _count: "desc" } }, { created_at: "desc" }]
+        : { created_at: "desc" },
     take: 50,
     include: {
       author: {
@@ -39,9 +37,12 @@ async function getPosts(sort: SortMode): Promise<FeedPost[]> {
 }
 
 export default async function FeedPage({ searchParams }: FeedPageProps) {
-  const sort: SortMode = searchParams.sort === 'trending' ? 'trending' : 'recent';
+  const sort: SortMode =
+    searchParams.sort === "trending" ? "trending" : "recent";
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const posts = await getPosts(sort);
 
@@ -55,91 +56,160 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
   const totalCoins = coinAgg._sum.coins ?? 0;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Hero header */}
-      <div className="mb-10 text-center">
-        <div className="inline-block mb-4">
-          <span className="text-xs font-sans uppercase tracking-[0.3em] text-blood border border-blood/30 px-3 py-1 rounded-sm">
-            Dystopian Poetry Exchange
+    <div className="max-w-5xl mx-auto px-4 py-8 font-mono">
+      {/* VHS divider */}
+      <div className="vhs-line mb-8" />
+
+      {/* Hero */}
+      <div className="mb-10">
+        <div className="mb-2">
+          <span
+            className="text-xs font-mono uppercase tracking-[0.4em]"
+            style={{ color: "#ff006e", textShadow: "0 0 8px #ff006e" }}
+          >
+            // dystopian poetry exchange
           </span>
         </div>
-        <h1 className="font-display text-4xl sm:text-5xl font-black text-cream mb-3 leading-tight">
-          Every word costs.<br />
-          <span className="text-blood">Every silence kills.</span>
+        <h1
+          className="font-mono text-3xl sm:text-5xl font-bold uppercase tracking-widest mb-3 leading-tight"
+          style={{
+            color: "#00ff41",
+            textShadow:
+              "0 0 10px #00ff41, 0 0 30px #00ff41, 0 0 60px rgba(0,255,65,0.4)",
+          }}
+        >
+          EVERY WORD COSTS.
+          <br />
+          <span
+            style={{
+              color: "#ff006e",
+              textShadow: "0 0 10px #ff006e, 0 0 30px #ff006e",
+            }}
+          >
+            EVERY SILENCE KILLS.
+          </span>
         </h1>
-        <p className="font-serif text-cream-muted text-lg max-w-lg mx-auto italic">
-          Attention is currency in this dying world. Spend wisely.
+        <p className="font-mono text-sm max-w-lg" style={{ color: "#003b0f" }}>
+          &gt; attention is currency in this dying world. spend wisely._
         </p>
 
-        {/* Economy stats */}
-        <div className="mt-6 inline-flex items-center gap-6 text-xs text-cream-faint border border-cream/10 rounded-sm px-5 py-2.5 bg-ink-50">
+        {/* Economy stats bar */}
+        <div
+          className="mt-6 inline-flex flex-wrap items-center gap-4 font-mono text-xs px-4 py-2"
+          style={{ border: "1px solid #003b0f", color: "#003b0f" }}
+        >
           <span>
-            <span className="text-gold font-semibold">{totalCoins.toLocaleString()}</span> coins in circulation
+            <span style={{ color: "#ffe600", textShadow: "0 0 8px #ffe600" }}>
+              ¢ {totalCoins.toLocaleString()}
+            </span>{" "}
+            coins in circulation
           </span>
-          <span className="text-cream/20">|</span>
+          <span style={{ color: "#003b0f" }}>|</span>
           <span>
-            <span className="text-cream font-semibold">{userCount.toLocaleString()}</span> souls
+            <span style={{ color: "#00ff41" }}>
+              {userCount.toLocaleString()}
+            </span>{" "}
+            souls
           </span>
-          <span className="text-cream/20">|</span>
+          <span style={{ color: "#003b0f" }}>|</span>
           <span>
-            <span className="text-cream font-semibold">{postCount.toLocaleString()}</span> confessions
+            <span style={{ color: "#00ff41" }}>
+              {postCount.toLocaleString()}
+            </span>{" "}
+            confessions
           </span>
         </div>
       </div>
 
       {/* Controls */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-1">
-          <Link href="/?sort=recent">
-            <Button
-              variant={sort === 'recent' ? 'outline' : 'ghost'}
-              size="sm"
-              className={`gap-1.5 ${sort === 'recent' ? 'border-cream/30 text-cream' : 'text-cream-faint'}`}
-            >
-              <Clock className="h-3.5 w-3.5" />
-              Recent
-            </Button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/?sort=recent"
+            className="font-mono text-xs uppercase tracking-widest px-3 py-1.5 transition-all"
+            style={
+              sort === "recent"
+                ? {
+                    color: "#00ff41",
+                    border: "1px solid #00ff41",
+                    boxShadow: "0 0 8px rgba(0,255,65,0.4)",
+                    textShadow: "0 0 8px #00ff41",
+                  }
+                : {
+                    color: "#003b0f",
+                    border: "1px solid #003b0f",
+                  }
+            }
+          >
+            [ RECENT ]
           </Link>
-          <Link href="/?sort=trending">
-            <Button
-              variant={sort === 'trending' ? 'outline' : 'ghost'}
-              size="sm"
-              className={`gap-1.5 ${sort === 'trending' ? 'border-cream/30 text-cream' : 'text-cream-faint'}`}
-            >
-              <Flame className="h-3.5 w-3.5" />
-              Trending
-            </Button>
+          <Link
+            href="/?sort=trending"
+            className="font-mono text-xs uppercase tracking-widest px-3 py-1.5 transition-all"
+            style={
+              sort === "trending"
+                ? {
+                    color: "#00ff41",
+                    border: "1px solid #00ff41",
+                    boxShadow: "0 0 8px rgba(0,255,65,0.4)",
+                    textShadow: "0 0 8px #00ff41",
+                  }
+                : {
+                    color: "#003b0f",
+                    border: "1px solid #003b0f",
+                  }
+            }
+          >
+            [ TRENDING ]
           </Link>
         </div>
 
         {user && (
-          <Link href="/write">
-            <Button size="sm" className="gap-1.5">
-              <PenLine className="h-3.5 w-3.5" />
-              Write
-            </Button>
+          <Link
+            href="/write"
+            className="font-mono text-xs uppercase tracking-widest px-3 py-1.5 transition-all"
+            style={{
+              color: "#00ff41",
+              border: "1px solid #00ff41",
+              boxShadow: "0 0 8px rgba(0,255,65,0.3)",
+            }}
+          >
+            + WRITE
           </Link>
         )}
       </div>
 
+      {/* VHS divider */}
+      <div className="vhs-line mb-6" />
+
       {/* Posts feed */}
       {posts.length === 0 ? (
-        <div className="text-center py-24">
-          <p className="font-display text-2xl text-cream-faint mb-2">The void is silent.</p>
-          <p className="font-serif text-cream-faint/60 text-sm italic">
-            Be the first to break the silence.
+        <div className="py-24 text-center">
+          <p
+            className="font-mono text-xl uppercase tracking-widest cursor"
+            style={{ color: "#003b0f" }}
+          >
+            &gt; THE VOID IS SILENT.
+          </p>
+          <p className="font-mono text-xs mt-2" style={{ color: "#003b0f" }}>
+            // be the first to break the silence
           </p>
           {user && (
-            <Link href="/write" className="mt-6 inline-block">
-              <Button className="gap-1.5">
-                <PenLine className="h-4 w-4" />
-                Write the first poem
-              </Button>
+            <Link
+              href="/write"
+              className="mt-6 inline-block font-mono text-xs uppercase tracking-widest px-4 py-2 transition-all"
+              style={{
+                color: "#00ff41",
+                border: "1px solid #00ff41",
+                boxShadow: "0 0 8px rgba(0,255,65,0.3)",
+              }}
+            >
+              + WRITE THE FIRST POEM
             </Link>
           )}
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
@@ -148,13 +218,25 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
 
       {/* Unauthenticated CTA */}
       {!user && posts.length > 0 && (
-        <div className="mt-12 text-center p-8 border border-blood/20 rounded-lg bg-blood/5">
-          <p className="font-display text-xl text-cream mb-2">You are a ghost here.</p>
-          <p className="font-serif text-cream-muted text-sm italic mb-4">
-            Sign in to spend your 10,000 starting coins and make yourself heard.
+        <div
+          className="mt-12 p-6 font-mono"
+          style={{
+            border: "1px solid #ff006e",
+            boxShadow: "0 0 12px rgba(255,0,110,0.15)",
+          }}
+        >
+          <p
+            className="text-base uppercase tracking-widest mb-2"
+            style={{ color: "#ff006e", textShadow: "0 0 8px #ff006e" }}
+          >
+            &gt; you are a ghost here.
           </p>
-          <p className="text-xs text-cream-faint">
-            Maximum 144,000 souls. 1,440,000,000 coins total in this economy.
+          <p className="text-xs mb-3" style={{ color: "#003b0f" }}>
+            // sign in to spend your 10,000 starting coins and make yourself
+            heard.
+          </p>
+          <p className="text-xs" style={{ color: "#003b0f" }}>
+            // max 144,000 souls. 1,440,000,000 coins total in this economy.
           </p>
         </div>
       )}

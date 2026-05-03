@@ -1,12 +1,10 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { CoinBalance } from './CoinBalance';
-import { Button } from './ui/button';
-import { PenLine, Skull, Home, User, LogOut, Shield } from 'lucide-react';
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { CoinBalance } from "./CoinBalance";
 
 interface NavbarProps {
   user?: {
@@ -26,13 +24,13 @@ export function Navbar({ user }: NavbarProps) {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/');
+    router.push("/");
     router.refresh();
   };
 
   const handleSignIn = async () => {
     await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider: "google",
       options: {
         redirectTo: `${window.location.origin}/api/auth/callback`,
       },
@@ -40,88 +38,154 @@ export function Navbar({ user }: NavbarProps) {
   };
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-cream/10 bg-ink/95 backdrop-blur-sm">
+    <nav
+      className="sticky top-0 z-40 bg-black"
+      style={{
+        borderBottom: "1px solid #00ff41",
+        boxShadow: "0 0 12px #00ff41, 0 2px 20px rgba(0,255,65,0.15)",
+      }}
+    >
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="font-display text-lg font-bold text-cream hover:text-gold transition-colors tracking-wide"
+          className="glow-green font-mono text-base font-bold tracking-widest uppercase"
+          style={{ color: "#00ff41", textDecoration: "none" }}
         >
-          Hard<span className="text-blood">Heart</span>Heard
+          &gt; HARDHEARTHEARD
         </Link>
 
         {/* Center nav */}
-        <div className="hidden sm:flex items-center gap-1">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="gap-1.5 text-cream-muted hover:text-cream">
-              <Home className="h-4 w-4" />
-              <span>Feed</span>
-            </Button>
+        <div className="hidden sm:flex items-center gap-4">
+          <Link
+            href="/write"
+            className="font-mono text-xs uppercase tracking-widest transition-all"
+            style={{ color: "#003b0f" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#00ff41";
+              (e.currentTarget as HTMLAnchorElement).style.textShadow =
+                "0 0 8px #00ff41, 0 0 20px #00ff41";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#003b0f";
+              (e.currentTarget as HTMLAnchorElement).style.textShadow = "";
+            }}
+          >
+            + WRITE
           </Link>
-          <Link href="/hall-of-shame">
-            <Button variant="ghost" size="sm" className="gap-1.5 text-cream-muted hover:text-blood">
-              <Skull className="h-4 w-4" />
-              <span>Hall of Shame</span>
-            </Button>
+          <Link
+            href="/hall-of-shame"
+            className="font-mono text-xs uppercase tracking-widest transition-all"
+            style={{ color: "#003b0f" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#ff006e";
+              (e.currentTarget as HTMLAnchorElement).style.textShadow =
+                "0 0 8px #ff006e, 0 0 20px #ff006e";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#003b0f";
+              (e.currentTarget as HTMLAnchorElement).style.textShadow = "";
+            }}
+          >
+            &#9760; SHAME
           </Link>
           {user?.is_admin && (
-            <Link href="/admin">
-              <Button variant="ghost" size="sm" className="gap-1.5 text-gold hover:text-gold-light">
-                <Shield className="h-4 w-4" />
-                <span>Admin</span>
-              </Button>
+            <Link
+              href="/admin"
+              className="font-mono text-xs uppercase tracking-widest transition-all"
+              style={{ color: "#ffe600" }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.textShadow =
+                  "0 0 8px #ffe600, 0 0 20px #ffe600";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.textShadow = "";
+              }}
+            >
+              &#9881; ADMIN
             </Link>
           )}
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {user ? (
             <>
               {/* Coin balance */}
               <CoinBalance balance={user.coins} size="sm" />
 
-              {/* Write button */}
-              {!user.is_banned && (
-                <Link href="/write">
-                  <Button size="sm" className="gap-1.5 hidden sm:flex">
-                    <PenLine className="h-3.5 w-3.5" />
-                    <span>Write</span>
-                  </Button>
-                </Link>
-              )}
-
-              {/* Profile dropdown */}
-              <Link href={`/profile/${user.username}`}>
-                <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                  {user.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={user.avatar_url}
-                      alt={user.display_name}
-                      className="h-8 w-8 rounded-full border border-cream/20 object-cover"
-                    />
-                  ) : (
-                    <div className="h-8 w-8 rounded-full border border-cream/20 bg-ink-50 flex items-center justify-center">
-                      <User className="h-4 w-4 text-cream-muted" />
-                    </div>
-                  )}
-                </button>
+              {/* Profile */}
+              <Link
+                href={`/profile/${user.username}`}
+                className="font-mono text-xs uppercase tracking-widest transition-all"
+                style={{ color: "#003b0f" }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color =
+                    "#00ff41";
+                  (e.currentTarget as HTMLAnchorElement).style.textShadow =
+                    "0 0 8px #00ff41";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.color =
+                    "#003b0f";
+                  (e.currentTarget as HTMLAnchorElement).style.textShadow = "";
+                }}
+              >
+                &#9670; {user.username}
               </Link>
 
               {/* Sign out */}
               <button
                 onClick={handleSignOut}
-                className="text-cream-faint hover:text-cream transition-colors"
-                title="Sign out"
+                className="font-mono text-xs uppercase tracking-widest transition-all"
+                style={{
+                  color: "#003b0f",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.color =
+                    "#ff006e";
+                  (e.currentTarget as HTMLButtonElement).style.textShadow =
+                    "0 0 8px #ff006e";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.color =
+                    "#003b0f";
+                  (e.currentTarget as HTMLButtonElement).style.textShadow = "";
+                }}
+                title="sign out"
               >
-                <LogOut className="h-4 w-4" />
+                [ EXIT ]
               </button>
             </>
           ) : (
-            <Button size="sm" onClick={handleSignIn} className="gap-1.5">
-              Sign in with Google
-            </Button>
+            <button
+              onClick={handleSignIn}
+              className="font-mono text-xs uppercase tracking-widest transition-all"
+              style={{
+                color: "#00ff41",
+                background: "none",
+                border: "1px solid #00ff41",
+                padding: "4px 10px",
+                cursor: "pointer",
+                boxShadow: "0 0 8px rgba(0,255,65,0.3)",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  "0 0 16px #00ff41, inset 0 0 8px rgba(0,255,65,0.1)";
+                (e.currentTarget as HTMLButtonElement).style.textShadow =
+                  "0 0 8px #00ff41";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                  "0 0 8px rgba(0,255,65,0.3)";
+                (e.currentTarget as HTMLButtonElement).style.textShadow = "";
+              }}
+            >
+              [ SIGN IN ]
+            </button>
           )}
         </div>
       </div>

@@ -1,17 +1,21 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Coins } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface CoinBalanceProps {
   balance: number;
   className?: string;
   animated?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 }
 
-export function CoinBalance({ balance, className, animated = true, size = 'md' }: CoinBalanceProps) {
+export function CoinBalance({
+  balance,
+  className,
+  animated = true,
+  size = "md",
+}: CoinBalanceProps) {
   const [displayBalance, setDisplayBalance] = useState(balance);
   const [isChanging, setIsChanging] = useState(false);
 
@@ -26,34 +30,36 @@ export function CoinBalance({ balance, className, animated = true, size = 'md' }
     }
   }, [balance, displayBalance]);
 
-  const danger = balance < 100;
-  const warning = balance < 500 && !danger;
+  const danger = balance < 50;
+  const warning = balance < 100 && !danger;
 
   const sizeClasses = {
-    sm: 'text-xs gap-1',
-    md: 'text-sm gap-1.5',
-    lg: 'text-base gap-2',
+    sm: "text-xs",
+    md: "text-sm",
+    lg: "text-base",
   };
 
-  const iconSizes = {
-    sm: 'h-3 w-3',
-    md: 'h-4 w-4',
-    lg: 'h-5 w-5',
-  };
+  const color = danger ? "#ff0000" : warning ? "#ff006e" : "#ffe600";
+  const glow = danger
+    ? "0 0 8px #ff0000, 0 0 20px #ff0000, 0 0 40px rgba(255,0,0,0.5)"
+    : warning
+      ? "0 0 8px #ff006e, 0 0 16px rgba(255,0,110,0.4)"
+      : "0 0 8px #ffe600, 0 0 16px rgba(255,230,0,0.3)";
 
   return (
     <span
       className={cn(
-        'inline-flex items-center font-semibold font-sans transition-all duration-300',
+        "inline-flex items-center font-mono font-semibold transition-all duration-300",
         sizeClasses[size],
-        danger ? 'text-blood animate-flicker' : warning ? 'text-gold-light' : 'text-gold',
-        animated && isChanging && 'scale-110',
-        className
+        animated && isChanging && "scale-110",
+        danger && "animate-flicker",
+        warning && "animate-glow-pulse",
+        className,
       )}
+      style={{ color, textShadow: glow }}
       title={`${balance.toLocaleString()} coins`}
     >
-      <Coins className={cn(iconSizes[size], animated && 'animate-coin-pulse')} />
-      <span>{displayBalance.toLocaleString()}</span>
+      ¢&nbsp;{displayBalance.toLocaleString()}
     </span>
   );
 }

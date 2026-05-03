@@ -1,22 +1,19 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Navbar } from '@/components/Navbar';
-import { Toaster } from '@/components/ui/toaster';
-import { createClient } from '@/lib/supabase/server';
-import prisma from '@/lib/prisma';
-import { isAdminEmail } from '@/lib/admin';
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+import type { Metadata } from "next";
+import "./globals.css";
+import { Navbar } from "@/components/Navbar";
+import { Toaster } from "@/components/ui/toaster";
+import { createClient } from "@/lib/supabase/server";
+import prisma from "@/lib/prisma";
+import { isAdminEmail } from "@/lib/admin";
 
 export const metadata: Metadata = {
-  title: 'HardHeartHeard — Attention is Currency',
+  title: "HardHeartHeard — Attention is Currency",
   description:
-    'A dystopian poetry exchange where attention is currency and silence is death. Every word costs. Every silence kills.',
+    "A dystopian poetry exchange where attention is currency and silence is death. Every word costs. Every silence kills.",
   openGraph: {
-    title: 'HardHeartHeard',
-    description: 'Attention is currency. Silence is death.',
-    type: 'website',
+    title: "HardHeartHeard",
+    description: "Attention is currency. Silence is death.",
+    type: "website",
   },
 };
 
@@ -51,7 +48,10 @@ export default async function RootLayout({
       if (!dbUser) {
         const username =
           supabaseUser.user_metadata?.preferred_username ||
-          supabaseUser.email.split('@')[0].replace(/[^a-z0-9_]/gi, '_').toLowerCase() ||
+          supabaseUser.email
+            .split("@")[0]
+            .replace(/[^a-z0-9_]/gi, "_")
+            .toLowerCase() ||
           `user_${Date.now()}`;
 
         const display_name =
@@ -85,7 +85,7 @@ export default async function RootLayout({
         });
       }
     } catch (err) {
-      console.error('Error fetching/creating user:', err);
+      console.error("Error fetching/creating user:", err);
     }
   }
 
@@ -93,15 +93,19 @@ export default async function RootLayout({
     <html lang="en" className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Inter:wght@400;500;600&display=swap"
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap"
           rel="stylesheet"
         />
       </head>
       <body
-        className={`${inter.variable} bg-ink text-cream min-h-screen font-sans antialiased`}
-        style={{ backgroundColor: '#0a0a0a', color: '#f5f0e8' }}
+        className="bg-black text-[#00ff41] min-h-screen font-mono"
+        style={{ backgroundColor: "#000", color: "#00ff41" }}
       >
         <Navbar user={dbUser} />
         <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
