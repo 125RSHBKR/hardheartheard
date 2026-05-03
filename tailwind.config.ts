@@ -58,6 +58,7 @@ const config: Config = {
         pink: "#ff006e",
         yellow: "#ffe600",
         red: "#ff0000",
+        cyan: "#00f5ff",
         dim: "#003b0f",
         void: "#000000",
         void2: "#0a0a0a",

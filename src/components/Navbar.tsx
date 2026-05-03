@@ -42,7 +42,8 @@ export function Navbar({ user }: NavbarProps) {
       className="sticky top-0 z-40 bg-black"
       style={{
         borderBottom: "1px solid #00ff41",
-        boxShadow: "0 0 12px #00ff41, 0 2px 20px rgba(0,255,65,0.15)",
+        boxShadow:
+          "0 0 12px #00ff41, 0 0 24px #00f5ff, 0 2px 20px rgba(0,255,65,0.15)",
       }}
     >
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -57,6 +58,22 @@ export function Navbar({ user }: NavbarProps) {
 
         {/* Center nav */}
         <div className="hidden sm:flex items-center gap-4">
+          <Link
+            href="/"
+            className="font-mono text-xs uppercase tracking-widest transition-all"
+            style={{ color: "#003b0f" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#00f5ff";
+              (e.currentTarget as HTMLAnchorElement).style.textShadow =
+                "0 0 8px #00f5ff, 0 0 20px #00f5ff";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "#003b0f";
+              (e.currentTarget as HTMLAnchorElement).style.textShadow = "";
+            }}
+          >
+            ~ FEED
+          </Link>
           <Link
             href="/write"
             className="font-mono text-xs uppercase tracking-widest transition-all"
@@ -121,9 +138,9 @@ export function Navbar({ user }: NavbarProps) {
                 style={{ color: "#003b0f" }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLAnchorElement).style.color =
-                    "#00ff41";
+                    "#00f5ff";
                   (e.currentTarget as HTMLAnchorElement).style.textShadow =
-                    "0 0 8px #00ff41";
+                    "0 0 8px #00f5ff";
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLAnchorElement).style.color =

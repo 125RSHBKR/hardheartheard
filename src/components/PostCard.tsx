@@ -62,7 +62,10 @@ export function PostCard({ post }: PostCardProps) {
       {/* Left accent border on hover */}
       <div
         className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        style={{ background: "#00ff41", boxShadow: "0 0 8px #00ff41" }}
+        style={{
+          background: "#00ff41",
+          boxShadow: "0 0 8px #00ff41, 0 0 16px #00f5ff",
+        }}
       />
 
       <Link href={`/post/${post.id}`} className="block p-5">
@@ -106,7 +109,10 @@ export function PostCard({ post }: PostCardProps) {
 
           <span
             className="ml-auto text-xs font-mono flex-shrink-0"
-            style={{ color: "#003b0f" }}
+            style={{
+              color: "#00f5ff",
+              textShadow: "0 0 4px rgba(0,245,255,0.4)",
+            }}
           >
             {formatTimeAgo(post.created_at)}
           </span>
@@ -138,7 +144,13 @@ export function PostCard({ post }: PostCardProps) {
           className="mt-4 pt-3 flex items-center gap-4"
           style={{ borderTop: "1px solid #003b0f" }}
         >
-          <span className="font-mono text-xs" style={{ color: "#003b0f" }}>
+          <span
+            className="font-mono text-xs"
+            style={{
+              color: "#00f5ff",
+              textShadow: "0 0 4px rgba(0,245,255,0.3)",
+            }}
+          >
             // {post._count.comments}{" "}
             {post._count.comments === 1 ? "response" : "responses"}
           </span>

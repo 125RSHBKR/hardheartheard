@@ -9,6 +9,7 @@
     --pink: #ff006e;
     --yellow: #ffe600;
     --red: #ff0000;
+    --cyan: #00f5ff;
     --void: #000000;
     --dim: #003b0f;
 
@@ -136,6 +137,12 @@ body::after {
         0 0 20px #ff0000,
         0 0 60px #ff0000;
 }
+.glow-cyan {
+    text-shadow:
+        0 0 8px #00f5ff,
+        0 0 20px #00f5ff,
+        0 0 40px #00f5ff;
+}
 
 /* Neon border glow */
 .border-neon {
@@ -161,6 +168,12 @@ body::after {
     box-shadow:
         0 0 8px #ff0000,
         inset 0 0 8px rgba(255, 0, 0, 0.05);
+}
+.border-cyan {
+    border: 1px solid #00f5ff;
+    box-shadow:
+        0 0 8px #00f5ff,
+        inset 0 0 8px rgba(0, 245, 255, 0.05);
 }
 
 /* Blinking cursor */
@@ -208,8 +221,16 @@ body::after {
 /* VHS header line */
 .vhs-line {
     height: 1px;
-    background: linear-gradient(90deg, transparent, #00ff41, transparent);
-    box-shadow: 0 0 8px #00ff41;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #00ff41,
+        #00f5ff,
+        transparent
+    );
+    box-shadow:
+        0 0 8px #00ff41,
+        0 0 16px #00f5ff;
 }
 
 /* Input / textarea VHS style */
