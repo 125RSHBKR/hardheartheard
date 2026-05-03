@@ -42,15 +42,17 @@ export function PostCard({ post }: PostCardProps) {
         (isDeceasedAuthor || isDeleted) && "opacity-60",
       )}
       style={{
-        border: "1px solid #003b0f",
+        border: "1px solid var(--c-border)",
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.border = "1px solid #00ff41";
+        (e.currentTarget as HTMLElement).style.border =
+          "1px solid var(--c-primary)";
         (e.currentTarget as HTMLElement).style.boxShadow =
-          "0 0 12px rgba(0,255,65,0.2), inset 0 0 8px rgba(0,255,65,0.03)";
+          "0 0 12px var(--c-primary)";
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.border = "1px solid #003b0f";
+        (e.currentTarget as HTMLElement).style.border =
+          "1px solid var(--c-border)";
         (e.currentTarget as HTMLElement).style.boxShadow = "";
       }}
     >
@@ -65,8 +67,8 @@ export function PostCard({ post }: PostCardProps) {
       <div
         className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         style={{
-          background: "#00ff41",
-          boxShadow: "0 0 8px #00ff41, 0 0 16px #00f5ff",
+          background: "var(--c-primary)",
+          boxShadow: "0 0 8px var(--c-primary)",
         }}
       />
 
@@ -77,9 +79,9 @@ export function PostCard({ post }: PostCardProps) {
           <div
             className="w-7 h-7 flex items-center justify-center flex-shrink-0 font-mono text-xs"
             style={{
-              border: "1px solid #003b0f",
-              color: "#003b0f",
-              background: "#000",
+              border: "1px solid var(--c-border)",
+              color: "var(--c-muted)",
+              background: "var(--c-bg)",
             }}
           >
             {firstLetter}
@@ -93,17 +95,21 @@ export function PostCard({ post }: PostCardProps) {
                 isDeceasedAuthor ? "line-through" : "",
               )}
               style={{
-                color: isDeceasedAuthor ? "#003b0f" : "#ff006e",
-                textShadow: isDeceasedAuthor
-                  ? ""
-                  : "0 0 6px rgba(255,0,110,0.4)",
+                color: isDeceasedAuthor ? "var(--c-muted)" : "var(--c-pink)",
+                textShadow: isDeceasedAuthor ? "" : "var(--c-glow-pink)",
               }}
               onClick={(e) => e.stopPropagation()}
             >
               @{post.author.username}
             </Link>
             {isDeceasedAuthor && (
-              <span className="text-xs font-mono" style={{ color: "#ff0000" }}>
+              <span
+                className="text-xs font-mono"
+                style={{
+                  color: "var(--c-red)",
+                  textShadow: "var(--c-glow-red)",
+                }}
+              >
                 [DECEASED]
               </span>
             )}
@@ -112,8 +118,8 @@ export function PostCard({ post }: PostCardProps) {
           <span
             className="ml-auto text-xs font-mono flex-shrink-0"
             style={{
-              color: "#00f5ff",
-              textShadow: "0 0 4px rgba(0,245,255,0.4)",
+              color: "var(--c-cyan)",
+              textShadow: "var(--c-glow-cyan)",
             }}
           >
             {formatTimeAgo(post.created_at)}
@@ -126,8 +132,8 @@ export function PostCard({ post }: PostCardProps) {
             "font-mono text-base font-bold mb-2 leading-snug uppercase tracking-wide",
           )}
           style={{
-            color: isDeceasedAuthor ? "#003b0f" : "#00ff41",
-            textShadow: isDeceasedAuthor ? "" : "0 0 6px rgba(0,255,65,0.4)",
+            color: isDeceasedAuthor ? "var(--c-muted)" : "var(--c-primary)",
+            textShadow: isDeceasedAuthor ? "" : "var(--c-glow-primary)",
           }}
         >
           {post.title}
@@ -136,7 +142,7 @@ export function PostCard({ post }: PostCardProps) {
         {/* Content preview */}
         <p
           className="font-mono text-xs leading-relaxed line-clamp-3"
-          style={{ color: "#00b32c" }}
+          style={{ color: "var(--c-secondary)" }}
         >
           {post.content}
         </p>
@@ -144,13 +150,13 @@ export function PostCard({ post }: PostCardProps) {
         {/* Footer */}
         <div
           className="mt-4 pt-3 flex items-center gap-4"
-          style={{ borderTop: "1px solid #003b0f" }}
+          style={{ borderTop: "1px solid var(--c-border)" }}
         >
           <span
             className="font-mono text-xs"
             style={{
-              color: "#00f5ff",
-              textShadow: "0 0 4px rgba(0,245,255,0.3)",
+              color: "var(--c-cyan)",
+              textShadow: "var(--c-glow-cyan)",
             }}
           >
             // {post._count.comments}{" "}
@@ -158,7 +164,7 @@ export function PostCard({ post }: PostCardProps) {
           </span>
           <span
             className="font-mono text-xs ml-auto"
-            style={{ color: "#003b0f" }}
+            style={{ color: "var(--c-muted)" }}
           >
             ¢ {post.coin_cost} cost
           </span>

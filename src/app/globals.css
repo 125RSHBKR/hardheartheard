@@ -4,16 +4,44 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --neon: #00ff41;
-    --pink: #ff006e;
-    --yellow: #ffe600;
-    --red: #ff0000;
-    --cyan: #00f5ff;
-    --void: #000000;
-    --dim: #003b0f;
+:root,
+[data-theme="bw"] {
+    --c-bg: #000000;
+    --c-primary: #ffffff;
+    --c-secondary: #aaaaaa;
+    --c-muted: #444444;
+    --c-border: #333333;
+    --c-pink: #ffffff;
+    --c-cyan: #cccccc;
+    --c-yellow: #ffffff;
+    --c-red: #ffffff;
+    --c-dim: #333333;
+    --c-glow-primary: 0 0 6px rgba(255, 255, 255, 0.4);
+    --c-glow-pink: 0 0 6px rgba(255, 255, 255, 0.3);
+    --c-glow-cyan: 0 0 4px rgba(200, 200, 200, 0.3);
+    --c-glow-yellow: 0 0 6px rgba(255, 255, 255, 0.3);
+    --c-glow-red: 0 0 8px rgba(255, 255, 255, 0.5);
+}
 
-    /* shadcn variables remapped to neon theme */
+[data-theme="color"] {
+    --c-bg: #000000;
+    --c-primary: #00ff41;
+    --c-secondary: #00b32c;
+    --c-muted: #003b0f;
+    --c-border: #003b0f;
+    --c-pink: #ff006e;
+    --c-cyan: #00f5ff;
+    --c-yellow: #ffe600;
+    --c-red: #ff0000;
+    --c-dim: #003b0f;
+    --c-glow-primary: 0 0 8px #00ff41, 0 0 20px #00ff41;
+    --c-glow-pink: 0 0 8px #ff006e, 0 0 20px #ff006e;
+    --c-glow-cyan: 0 0 6px #00f5ff;
+    --c-glow-yellow: 0 0 8px #ffe600, 0 0 20px #ffe600;
+    --c-glow-red: 0 0 8px #ff0000, 0 0 20px #ff0000;
+}
+
+:root {
     --background: 0 0% 0%;
     --foreground: 120 100% 50%;
     --card: 0 0% 4%;
@@ -42,12 +70,15 @@
 
 html,
 body {
-    background: #000;
-    color: #00ff41;
+    background: var(--c-bg);
+    color: var(--c-primary);
     font-family: "Share Tech Mono", "Courier New", monospace;
     font-size: 14px;
     line-height: 1.6;
     min-height: 100vh;
+    transition:
+        color 0.3s ease,
+        background 0.3s ease;
 }
 
 /* CRT scanlines overlay */
@@ -114,66 +145,46 @@ body::after {
 
 /* Neon text glow utilities */
 .glow-green {
-    text-shadow:
-        0 0 8px #00ff41,
-        0 0 20px #00ff41,
-        0 0 40px #00ff41;
+    text-shadow: var(--c-glow-primary);
+    color: var(--c-primary);
 }
 .glow-pink {
-    text-shadow:
-        0 0 8px #ff006e,
-        0 0 20px #ff006e,
-        0 0 40px #ff006e;
+    text-shadow: var(--c-glow-pink);
+    color: var(--c-pink);
 }
 .glow-yellow {
-    text-shadow:
-        0 0 8px #ffe600,
-        0 0 20px #ffe600,
-        0 0 40px #ffe600;
+    text-shadow: var(--c-glow-yellow);
+    color: var(--c-yellow);
 }
 .glow-red {
-    text-shadow:
-        0 0 8px #ff0000,
-        0 0 20px #ff0000,
-        0 0 60px #ff0000;
+    text-shadow: var(--c-glow-red);
+    color: var(--c-red);
 }
 .glow-cyan {
-    text-shadow:
-        0 0 8px #00f5ff,
-        0 0 20px #00f5ff,
-        0 0 40px #00f5ff;
+    text-shadow: var(--c-glow-cyan);
+    color: var(--c-cyan);
 }
 
 /* Neon border glow */
 .border-neon {
-    border: 1px solid #00ff41;
-    box-shadow:
-        0 0 8px #00ff41,
-        inset 0 0 8px rgba(0, 255, 65, 0.05);
+    border: 1px solid var(--c-primary);
+    box-shadow: 0 0 8px var(--c-primary);
 }
 .border-pink {
-    border: 1px solid #ff006e;
-    box-shadow:
-        0 0 8px #ff006e,
-        inset 0 0 8px rgba(255, 0, 110, 0.05);
+    border: 1px solid var(--c-pink);
+    box-shadow: 0 0 8px var(--c-pink);
 }
 .border-yellow {
-    border: 1px solid #ffe600;
-    box-shadow:
-        0 0 8px #ffe600,
-        inset 0 0 8px rgba(255, 230, 0, 0.05);
+    border: 1px solid var(--c-yellow);
+    box-shadow: 0 0 8px var(--c-yellow);
 }
 .border-red-glow {
-    border: 1px solid #ff0000;
-    box-shadow:
-        0 0 8px #ff0000,
-        inset 0 0 8px rgba(255, 0, 0, 0.05);
+    border: 1px solid var(--c-red);
+    box-shadow: 0 0 8px var(--c-red);
 }
 .border-cyan {
-    border: 1px solid #00f5ff;
-    box-shadow:
-        0 0 8px #00f5ff,
-        inset 0 0 8px rgba(0, 245, 255, 0.05);
+    border: 1px solid var(--c-cyan);
+    box-shadow: 0 0 8px var(--c-cyan);
 }
 
 /* Blinking cursor */
@@ -196,11 +207,11 @@ body::after {
 /* Poem content */
 .prose-poem {
     font-family: "Share Tech Mono", monospace;
-    color: #00ff41;
+    color: var(--c-primary);
     white-space: pre-wrap;
     word-break: break-word;
     line-height: 1.8;
-    text-shadow: 0 0 6px rgba(0, 255, 65, 0.5);
+    text-shadow: var(--c-glow-primary);
 }
 
 /* DECEASED stamp */
@@ -224,34 +235,36 @@ body::after {
     background: linear-gradient(
         90deg,
         transparent,
-        #00ff41,
-        #00f5ff,
+        var(--c-primary),
+        var(--c-cyan),
         transparent
     );
-    box-shadow:
-        0 0 8px #00ff41,
-        0 0 16px #00f5ff;
+    box-shadow: 0 0 8px var(--c-primary);
+    transition: all 0.3s ease;
 }
 
 /* Input / textarea VHS style */
 input,
 textarea {
-    background: #000 !important;
-    color: #00ff41 !important;
-    border: 1px solid #003b0f !important;
+    background: var(--c-bg) !important;
+    color: var(--c-primary) !important;
+    border: 1px solid var(--c-border) !important;
     border-radius: 0 !important;
     font-family: "Share Tech Mono", monospace !important;
-    caret-color: #00ff41;
+    caret-color: var(--c-primary);
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 input:focus,
 textarea:focus {
-    border-color: #00ff41 !important;
-    box-shadow: 0 0 8px rgba(0, 255, 65, 0.4) !important;
+    border-color: var(--c-primary) !important;
+    box-shadow: 0 0 8px var(--c-primary) !important;
     outline: none !important;
 }
 input::placeholder,
 textarea::placeholder {
-    color: #003b0f !important;
+    color: var(--c-border) !important;
 }
 
 /* Button base override */

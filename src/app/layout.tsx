@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { createClient } from "@/lib/supabase/server";
 import prisma from "@/lib/prisma";
 import { isAdminEmail } from "@/lib/admin";
@@ -104,12 +105,14 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className="bg-black text-[#00ff41] min-h-screen font-mono"
-        style={{ backgroundColor: "#000", color: "#00ff41" }}
+        className="min-h-screen font-mono"
+        style={{ backgroundColor: "#000", color: "#fff" }}
       >
-        <Navbar user={dbUser} />
-        <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
-        <Toaster />
+        <ThemeProvider>
+          <Navbar user={dbUser} />
+          <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

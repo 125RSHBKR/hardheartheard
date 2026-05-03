@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { CoinBalance } from "./CoinBalance";
+import { useTheme } from "./ThemeProvider";
 
 interface NavbarProps {
   user?: {
@@ -21,6 +22,7 @@ interface NavbarProps {
 export function Navbar({ user }: NavbarProps) {
   const router = useRouter();
   const supabase = createClient();
+  const { theme, toggle } = useTheme();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -126,6 +128,38 @@ export function Navbar({ user }: NavbarProps) {
 
         {/* Right side */}
         <div className="flex items-center gap-4">
+          {/* Theme toggle */}
+          <button
+            onClick={toggle}
+            className="font-mono text-xs uppercase tracking-widest transition-all"
+            style={{
+              color: "var(--c-cyan)",
+              background: "none",
+              border: "1px solid var(--c-border)",
+              padding: "3px 8px",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor =
+                "var(--c-primary)";
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "var(--c-primary)";
+              (e.currentTarget as HTMLButtonElement).style.textShadow =
+                "var(--c-glow-primary)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.borderColor =
+                "var(--c-border)";
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "var(--c-cyan)";
+              (e.currentTarget as HTMLButtonElement).style.textShadow = "";
+            }}
+            title={
+              theme === "bw" ? "switch to color mode" : "switch to b&w mode"
+            }
+          >
+            {theme === "bw" ? "◑ color" : "◑ b&w"}
+          </button>
           {user ? (
             <>
               {/* Coin balance */}
