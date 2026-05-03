@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  username         String    @unique
+  display_name     String
+  bio              String?
+  avatar_url       String?
+  links            Json      @default("[]")
+  coins            Int       @default(10000)
+  is_banned        Boolean   @default(false)
+  ban_reason       String?
+  banned_at        DateTime?
+  is_admin         Boolean   @default(false)
+  fingerprint_hash String?
+  ip_history       String[]  @default([])
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  posts               Post[]
+  comments            Comment[]
+  transactions_sent   CoinTransaction[] @relation("FromUser")
+  transactions_received CoinTransaction[] @relation("ToUser")
+  hall_of_shame       HallOfShame?
+  fingerprint_logs    FingerprintLog[]
+
+  @@map("users")
+}
+
+model Post {
+  id         String   @id @default(uuid())
+  author_id  String
+  title      String
+  content    String
+  coin_cost  Int      @default(10)
+  is_deleted Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  author   User      @relation(fields: [author_id], references: [id])
+  comments Comment[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id              String   @id @default(uuid())
+  post_id         String
+  author_id       String
+  content         String
+  coin_cost       Int      @default(3)
+  coins_received  Int      @default(0)
+  coins_lost      Int      @default(0)
+  is_spam_flagged Boolean  @default(false)
+  spam_flag_count Int      @default(0)
+  is_deleted      Boolean  @default(false)
+  created_at      DateTime @default(now())
+
+  post   Post @relation(fields: [post_id], references: [id])
+  author User @relation(fields: [author_id], references: [id])
+
+  @@map("comments")
+}
+
+enum TransactionType {
+  POST_COST
+  COMMENT_COST
+  TIP
+  PUNISHMENT
+  TRANSFER
+  ADMIN_GRANT
+  ADMIN_TAKE
+}
+
+model CoinTransaction {
+  id           String          @id @default(uuid())
+  from_user_id String?
+  to_user_id   String?
+  amount       Int
+  type         TransactionType
+  reference_id String?
+  created_at   DateTime        @default(now())
+
+  from_user User? @relation("FromUser", fields: [from_user_id], references: [id])
+  to_user   User? @relation("ToUser", fields: [to_user_id], references: [id])
+
+  @@map("coin_transactions")
+}
+
+model HallOfShame {
+  id                 String   @id @default(uuid())
+  user_id            String   @unique
+  username           String
+  display_name       String
+  banned_at          DateTime
+  reason             String
+  final_coin_balance Int
+  created_at         DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("hall_of_shame")
+}
+
+model FingerprintLog {
+  id               String   @id @default(uuid())
+  fingerprint_hash String
+  user_id          String?
+  ip_address       String
+  user_agent       String
+  created_at       DateTime @default(now())
+
+  user User? @relation(fields: [user_id], references: [id])
+
+  @@map("fingerprint_logs")
+}

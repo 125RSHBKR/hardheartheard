@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 40 30% 92%;
+    --card: 0 0% 8%;
+    --card-foreground: 40 30% 92%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 40 30% 92%;
+    --primary: 0 100% 27%;
+    --primary-foreground: 40 30% 92%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 40 30% 92%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 40 10% 55%;
+    --accent: 0 0% 13%;
+    --accent-foreground: 40 30% 92%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 40 30% 92%;
+    --border: 40 10% 15%;
+    --input: 40 10% 15%;
+    --ring: 38 60% 54%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-ink text-cream;
+    background-color: #0a0a0a;
+    color: #f5f0e8;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a3a;
+  }
+
+  /* Selection */
+  ::selection {
+    background: rgba(139, 0, 0, 0.3);
+    color: #f5f0e8;
+  }
+
+  /* Focus ring */
+  *:focus-visible {
+    outline: 2px solid #c9a84c;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Poem/content text styling */
+  .prose-poem {
+    @apply font-serif text-cream leading-relaxed;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Blood drip decoration */
+  .blood-border {
+    border-left: 2px solid #8b0000;
+    padding-left: 1rem;
+  }
+
+  /* Grain texture overlay */
+  .grain-overlay::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    z-index: 9999;
+  }
+}
