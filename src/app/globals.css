@@ -4,25 +4,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── B&W theme (default) ─────────────────────────────── */
 :root,
 [data-theme="bw"] {
     --c-bg: #000000;
     --c-primary: #ffffff;
-    --c-secondary: #aaaaaa;
-    --c-muted: #444444;
-    --c-border: #333333;
+    --c-secondary: #bbbbbb;
+    --c-muted: #666666;
+    --c-border: #444444;
     --c-pink: #ffffff;
     --c-cyan: #cccccc;
     --c-yellow: #ffffff;
     --c-red: #ffffff;
     --c-dim: #333333;
-    --c-glow-primary: 0 0 6px rgba(255, 255, 255, 0.4);
-    --c-glow-pink: 0 0 6px rgba(255, 255, 255, 0.3);
-    --c-glow-cyan: 0 0 4px rgba(200, 200, 200, 0.3);
-    --c-glow-yellow: 0 0 6px rgba(255, 255, 255, 0.3);
-    --c-glow-red: 0 0 8px rgba(255, 255, 255, 0.5);
+    --c-glow-primary: none;
+    --c-glow-pink: none;
+    --c-glow-cyan: none;
+    --c-glow-yellow: none;
+    --c-glow-red: none;
+    --c-scanline: rgba(255, 255, 255, 0.03);
+    --c-noise-opacity: 0.08;
 }
 
+/* ── Color theme ─────────────────────────────────────── */
 [data-theme="color"] {
     --c-bg: #000000;
     --c-primary: #00ff41;
@@ -39,31 +43,35 @@
     --c-glow-cyan: 0 0 6px #00f5ff;
     --c-glow-yellow: 0 0 8px #ffe600, 0 0 20px #ffe600;
     --c-glow-red: 0 0 8px #ff0000, 0 0 20px #ff0000;
+    --c-scanline: rgba(0, 255, 65, 0.04);
+    --c-noise-opacity: 0.04;
 }
 
+/* ── shadcn CSS variable shims ───────────────────────── */
 :root {
     --background: 0 0% 0%;
-    --foreground: 120 100% 50%;
+    --foreground: 0 0% 100%;
     --card: 0 0% 4%;
-    --card-foreground: 120 100% 50%;
+    --card-foreground: 0 0% 100%;
     --popover: 0 0% 4%;
-    --popover-foreground: 120 100% 50%;
-    --primary: 120 100% 50%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
     --primary-foreground: 0 0% 0%;
     --secondary: 0 0% 6%;
-    --secondary-foreground: 120 100% 50%;
+    --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 8%;
-    --muted-foreground: 120 40% 30%;
-    --accent: 330 100% 44%;
-    --accent-foreground: 0 0% 0%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 0 0% 13%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 0%;
-    --border: 120 100% 20%;
-    --input: 120 100% 10%;
-    --ring: 120 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 27%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 100%;
     --radius: 0rem;
 }
 
+/* ── Reset ───────────────────────────────────────────── */
 * {
     box-sizing: border-box;
 }
@@ -77,123 +85,140 @@ body {
     line-height: 1.6;
     min-height: 100vh;
     transition:
-        color 0.3s ease,
-        background 0.3s ease;
+        color 0.25s ease,
+        background 0.25s ease;
 }
 
-/* CRT scanlines overlay */
+/* ── Noise overlay ───────────────────────────────────── */
+/* SVG-based film grain — fixed, above everything */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 0, 0, 0.15) 2px,
-        rgba(0, 0, 0, 0.15) 4px
-    );
     pointer-events: none;
     z-index: 9999;
+    opacity: var(--c-noise-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 300px 300px;
 }
 
-/* Moving scanline */
+/* ── CRT scanlines ───────────────────────────────────── */
 body::after {
     content: "";
     position: fixed;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: rgba(0, 255, 65, 0.07);
-    animation: scanline 8s linear infinite;
+    inset: 0;
     pointer-events: none;
     z-index: 9998;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        var(--c-scanline) 3px,
+        var(--c-scanline) 4px
+    );
 }
 
-@keyframes scanline {
+/* ── Moving scanline (color mode only) ───────────────── */
+[data-theme="color"] .scanline-bar {
+    display: block;
+}
+.scanline-bar {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(0, 255, 65, 0.06);
+    animation: scanline-move 8s linear infinite;
+    pointer-events: none;
+    z-index: 9997;
+}
+@keyframes scanline-move {
     0% {
-        top: -4px;
+        top: -3px;
     }
     100% {
         top: 100vh;
     }
 }
 
-/* Scrollbar */
+/* ── Scrollbar ───────────────────────────────────────── */
 ::-webkit-scrollbar {
-    width: 4px;
+    width: 3px;
 }
 ::-webkit-scrollbar-track {
     background: #000;
 }
 ::-webkit-scrollbar-thumb {
-    background: #00ff41;
+    background: var(--c-border);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--c-primary);
 }
 
-/* Selection */
+/* ── Selection ───────────────────────────────────────── */
 ::selection {
-    background: #00ff41;
-    color: #000;
+    background: var(--c-primary);
+    color: var(--c-bg);
 }
 
-/* Focus */
+/* ── Focus ───────────────────────────────────────────── */
 *:focus-visible {
-    outline: 1px solid #00ff41;
+    outline: 1px solid var(--c-primary);
     outline-offset: 2px;
-    box-shadow: 0 0 8px #00ff41;
 }
 
-/* Neon text glow utilities */
+/* ── Glow text utilities ─────────────────────────────── */
 .glow-green {
-    text-shadow: var(--c-glow-primary);
     color: var(--c-primary);
+    text-shadow: var(--c-glow-primary);
 }
 .glow-pink {
-    text-shadow: var(--c-glow-pink);
     color: var(--c-pink);
+    text-shadow: var(--c-glow-pink);
 }
 .glow-yellow {
-    text-shadow: var(--c-glow-yellow);
     color: var(--c-yellow);
+    text-shadow: var(--c-glow-yellow);
 }
 .glow-red {
-    text-shadow: var(--c-glow-red);
     color: var(--c-red);
+    text-shadow: var(--c-glow-red);
 }
 .glow-cyan {
-    text-shadow: var(--c-glow-cyan);
     color: var(--c-cyan);
+    text-shadow: var(--c-glow-cyan);
 }
 
-/* Neon border glow */
+/* ── Glow border utilities ───────────────────────────── */
 .border-neon {
     border: 1px solid var(--c-primary);
-    box-shadow: 0 0 8px var(--c-primary);
+    box-shadow: var(--c-glow-primary);
 }
 .border-pink {
     border: 1px solid var(--c-pink);
-    box-shadow: 0 0 8px var(--c-pink);
+    box-shadow: var(--c-glow-pink);
 }
 .border-yellow {
     border: 1px solid var(--c-yellow);
-    box-shadow: 0 0 8px var(--c-yellow);
+    box-shadow: var(--c-glow-yellow);
 }
 .border-red-glow {
     border: 1px solid var(--c-red);
-    box-shadow: 0 0 8px var(--c-red);
+    box-shadow: var(--c-glow-red);
 }
 .border-cyan {
     border: 1px solid var(--c-cyan);
-    box-shadow: 0 0 8px var(--c-cyan);
+    box-shadow: var(--c-glow-cyan);
 }
 
-/* Blinking cursor */
+/* ── Cursor blink ────────────────────────────────────── */
 .cursor::after {
     content: "█";
     animation: blink 1s step-end infinite;
-    color: #00ff41;
+    color: var(--c-primary);
 }
-
 @keyframes blink {
     0%,
     100% {
@@ -204,46 +229,42 @@ body::after {
     }
 }
 
-/* Poem content */
+/* ── Poem content ────────────────────────────────────── */
 .prose-poem {
     font-family: "Share Tech Mono", monospace;
     color: var(--c-primary);
     white-space: pre-wrap;
     word-break: break-word;
-    line-height: 1.8;
-    text-shadow: var(--c-glow-primary);
+    line-height: 1.9;
+    letter-spacing: 0.01em;
 }
 
-/* DECEASED stamp */
+/* ── DECEASED stamp ──────────────────────────────────── */
 .deceased-stamp {
-    color: rgba(255, 0, 0, 0.25);
+    color: rgba(255, 255, 255, 0.15);
     font-size: 3rem;
     font-weight: 900;
     letter-spacing: 0.3em;
-    border: 4px solid rgba(255, 0, 0, 0.2);
+    border: 4px solid rgba(255, 255, 255, 0.12);
     padding: 4px 12px;
     transform: rotate(-15deg);
-    text-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.1);
     user-select: none;
     pointer-events: none;
 }
 
-/* VHS header line */
+/* ── VHS divider line ────────────────────────────────── */
 .vhs-line {
     height: 1px;
     background: linear-gradient(
         90deg,
         transparent,
         var(--c-primary),
-        var(--c-cyan),
         transparent
     );
-    box-shadow: 0 0 8px var(--c-primary);
-    transition: all 0.3s ease;
+    opacity: 0.5;
 }
 
-/* Input / textarea VHS style */
+/* ── Inputs & textareas ──────────────────────────────── */
 input,
 textarea {
     background: var(--c-bg) !important;
@@ -252,22 +273,20 @@ textarea {
     border-radius: 0 !important;
     font-family: "Share Tech Mono", monospace !important;
     caret-color: var(--c-primary);
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: border-color 0.15s ease;
 }
 input:focus,
 textarea:focus {
     border-color: var(--c-primary) !important;
-    box-shadow: 0 0 8px var(--c-primary) !important;
     outline: none !important;
 }
 input::placeholder,
 textarea::placeholder {
-    color: var(--c-border) !important;
+    color: var(--c-muted) !important;
+    opacity: 0.5;
 }
 
-/* Button base override */
+/* ── Buttons ─────────────────────────────────────────── */
 button {
     border-radius: 0 !important;
     font-family: "Share Tech Mono", monospace !important;
