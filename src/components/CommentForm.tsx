@@ -1,25 +1,26 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { AlertCircle, Coins, Send } from 'lucide-react';
-import { Button } from './ui/button';
-import { Textarea } from './ui/textarea';
-import { useToast } from './ui/use-toast';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "./ui/use-toast";
 
 interface CommentFormProps {
   postId: string;
   userCoins: number;
   onSuccess?: (newBalance: number) => void;
-  required?: boolean; // Whether the comment is required before leaving
+  required?: boolean;
 }
 
-const COMMENT_COST_DISPLAY = '3.48';
+const COMMENT_COST_DISPLAY = "3.48";
 const COMMENT_COST_ACTUAL = 3;
 
-export function CommentForm({ postId, userCoins, onSuccess, required = false }: CommentFormProps) {
-  const [content, setContent] = useState('');
+export function CommentForm({
+  postId,
+  userCoins,
+  onSuccess,
+  required = false,
+}: CommentFormProps) {
+  const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -34,9 +35,9 @@ export function CommentForm({ postId, userCoins, onSuccess, required = false }: 
 
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ post_id: postId, content: content.trim() }),
       });
 
@@ -44,27 +45,25 @@ export function CommentForm({ postId, userCoins, onSuccess, required = false }: 
 
       if (!res.ok) {
         toast({
-          title: 'Failed to post response',
-          description: data.error || 'Something went wrong.',
-          variant: 'destructive',
+          title: "transmission failed",
+          description: data.error || "something went wrong.",
+          variant: "destructive",
         });
         return;
       }
 
       toast({
-        title: 'Response posted',
-        description: `${COMMENT_COST_DISPLAY} coins deducted. Remaining: ${data.newBalance?.toLocaleString() ?? '?'}`,
-        variant: 'default',
+        title: "// response posted",
+        description: `¢ ${COMMENT_COST_DISPLAY} deducted. balance: ${data.newBalance?.toLocaleString() ?? "?"}`,
       });
-
-      setContent('');
+      setContent("");
       onSuccess?.(data.newBalance);
       router.refresh();
     } catch {
       toast({
-        title: 'Error',
-        description: 'Could not submit your response.',
-        variant: 'destructive',
+        title: "error",
+        description: "could not submit your response.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -72,59 +71,103 @@ export function CommentForm({ postId, userCoins, onSuccess, required = false }: 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
+    <form onSubmit={handleSubmit} className="space-y-3 font-mono">
       {required && (
-        <div className="flex items-start gap-2 p-3 rounded-md bg-blood/10 border border-blood/30">
-          <AlertCircle className="h-4 w-4 text-blood flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-cream-muted leading-relaxed">
-            <span className="text-blood font-semibold">Attention is the price of entry.</span>{' '}
-            You must leave a response before you can leave this page.
+        <div
+          className="p-3"
+          style={{
+            border: "1px solid rgba(255,0,0,0.4)",
+            background: "rgba(255,0,0,0.05)",
+          }}
+        >
+          <p
+            className="text-xs"
+            style={{
+              color: "#ff0000",
+              textShadow: "0 0 6px rgba(255,0,0,0.4)",
+            }}
+          >
+            ! attention is the price of entry. you must respond before you can
+            leave.
           </p>
         </div>
       )}
 
       <div className="relative">
-        <Textarea
+        <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Leave your mark... (min. 5 characters)"
-          className="min-h-[120px] resize-none font-serif text-sm pr-4"
+          placeholder="leave your mark... (min. 5 characters)"
+          className="w-full min-h-[120px] resize-none font-mono text-sm p-3"
+          style={{
+            background: "#000",
+            color: "#00ff41",
+            border: "1px solid #003b0f",
+            caretColor: "#00ff41",
+            outline: "none",
+          }}
           maxLength={1000}
           disabled={!canAfford || isSubmitting}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = "#00ff41";
+            e.currentTarget.style.boxShadow = "0 0 8px rgba(0,255,65,0.3)";
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = "#003b0f";
+            e.currentTarget.style.boxShadow = "";
+          }}
         />
         <span
-          className={cn(
-            'absolute bottom-2 right-3 text-xs',
-            charCount > 900 ? 'text-blood' : 'text-cream-faint'
-          )}
+          className="absolute bottom-2 right-3 text-xs"
+          style={{ color: charCount > 900 ? "#ff0000" : "#003b0f" }}
         >
           {charCount}/1000
         </span>
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs">
-          <Coins className="h-3.5 w-3.5 text-gold" />
-          <span className={cn(canAfford ? 'text-cream-muted' : 'text-blood font-semibold')}>
-            {canAfford ? (
-              <>
-                Costs <span className="text-gold font-semibold">{COMMENT_COST_DISPLAY}</span> coins
-              </>
-            ) : (
-              'Insufficient coins — you cannot respond'
-            )}
-          </span>
-        </div>
-
-        <Button
-          type="submit"
-          size="sm"
-          disabled={!isValid || !canAfford || isSubmitting}
-          className="gap-1.5"
+        <span
+          className="text-xs"
+          style={{
+            color: canAfford ? "#003b0f" : "#ff0000",
+            textShadow: canAfford ? "" : "0 0 6px #ff0000",
+          }}
         >
-          <Send className="h-3.5 w-3.5" />
-          {isSubmitting ? 'Posting...' : 'Post Response'}
-        </Button>
+          {canAfford
+            ? `¢ ${COMMENT_COST_DISPLAY} cost`
+            : "! insufficient coins"}
+        </span>
+
+        <button
+          type="submit"
+          disabled={!isValid || !canAfford || isSubmitting}
+          className="px-4 py-1.5 text-xs font-mono uppercase tracking-widest transition-all"
+          style={{
+            color: "#00ff41",
+            border: "1px solid #003b0f",
+            background: "#000",
+            cursor:
+              !isValid || !canAfford || isSubmitting
+                ? "not-allowed"
+                : "pointer",
+            opacity: !isValid || !canAfford || isSubmitting ? 0.4 : 1,
+          }}
+          onMouseEnter={(e) => {
+            if (!isSubmitting && isValid && canAfford) {
+              (e.currentTarget as HTMLButtonElement).style.borderColor =
+                "#00ff41";
+              (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                "0 0 8px #00ff41";
+            }
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor =
+              "#003b0f";
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = "";
+          }}
+        >
+          {isSubmitting ? "// transmitting..." : "> post response"}
+        </button>
       </div>
     </form>
   );
