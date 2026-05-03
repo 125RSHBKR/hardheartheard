@@ -1,4 +1,5 @@
 import React from "react";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { PostCard } from "@/components/PostCard";
@@ -43,6 +44,8 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) redirect("/welcome");
 
   const posts = await getPosts(sort);
 
@@ -164,19 +167,17 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
           </Link>
         </div>
 
-        {user && (
-          <Link
-            href="/write"
-            className="font-mono text-xs uppercase tracking-widest px-3 py-1.5 transition-all"
-            style={{
-              color: "#00ff41",
-              border: "1px solid #00ff41",
-              boxShadow: "0 0 8px rgba(0,255,65,0.3)",
-            }}
-          >
-            + WRITE
-          </Link>
-        )}
+        <Link
+          href="/write"
+          className="font-mono text-xs uppercase tracking-widest px-3 py-1.5 transition-all"
+          style={{
+            color: "#00ff41",
+            border: "1px solid #00ff41",
+            boxShadow: "0 0 8px rgba(0,255,65,0.3)",
+          }}
+        >
+          + WRITE
+        </Link>
       </div>
 
       {/* VHS divider */}
@@ -194,50 +195,23 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
           <p className="font-mono text-xs mt-2" style={{ color: "#003b0f" }}>
             // be the first to break the silence
           </p>
-          {user && (
-            <Link
-              href="/write"
-              className="mt-6 inline-block font-mono text-xs uppercase tracking-widest px-4 py-2 transition-all"
-              style={{
-                color: "#00ff41",
-                border: "1px solid #00ff41",
-                boxShadow: "0 0 8px rgba(0,255,65,0.3)",
-              }}
-            >
-              + WRITE THE FIRST POEM
-            </Link>
-          )}
+          <Link
+            href="/write"
+            className="mt-6 inline-block font-mono text-xs uppercase tracking-widest px-4 py-2 transition-all"
+            style={{
+              color: "#00ff41",
+              border: "1px solid #00ff41",
+              boxShadow: "0 0 8px rgba(0,255,65,0.3)",
+            }}
+          >
+            + WRITE THE FIRST POEM
+          </Link>
         </div>
       ) : (
         <div className="grid gap-3">
           {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
-        </div>
-      )}
-
-      {/* Unauthenticated CTA */}
-      {!user && posts.length > 0 && (
-        <div
-          className="mt-12 p-6 font-mono"
-          style={{
-            border: "1px solid #ff006e",
-            boxShadow: "0 0 12px rgba(255,0,110,0.15)",
-          }}
-        >
-          <p
-            className="text-base uppercase tracking-widest mb-2"
-            style={{ color: "#ff006e", textShadow: "0 0 8px #ff006e" }}
-          >
-            &gt; you are a ghost here.
-          </p>
-          <p className="text-xs mb-3" style={{ color: "#003b0f" }}>
-            // sign in to spend your 10,000 starting coins and make yourself
-            heard.
-          </p>
-          <p className="text-xs" style={{ color: "#003b0f" }}>
-            // max 144,000 souls. 1,440,000,000 coins total in this economy.
-          </p>
         </div>
       )}
     </div>
