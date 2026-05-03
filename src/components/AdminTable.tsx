@@ -1,30 +1,76 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { ChevronUp, ChevronDown, Flag, User, Coins } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { useToast } from './ui/use-toast';
-import { cn } from '@/lib/utils';
-import type { AppComment, AppUser } from '@/types';
+import React from "react";
 
+/* ─── colour tokens ─────────────────────────────────── */
+const C = {
+  green: "#00ff41",
+  cyan: "#00f5ff",
+  dimGreen: "#003b0f",
+  black: "#000000",
+} as const;
+
+const mono = "'Share Tech Mono', monospace";
+
+/* ─── types ─────────────────────────────────────────── */
 interface AdminTableProps {
-  // Admin table is versatile — pass items and column definitions
   title: string;
   description?: string;
   children: React.ReactNode;
 }
 
+/* ─── AdminTable ─────────────────────────────────────── */
 export function AdminTable({ title, description, children }: AdminTableProps) {
   return (
-    <div className="border border-cream/10 rounded-lg overflow-hidden">
-      <div className="px-4 py-3 bg-ink-100 border-b border-cream/10">
-        <h3 className="font-display text-sm font-semibold text-cream">{title}</h3>
-        {description && <p className="text-xs text-cream-faint mt-0.5">{description}</p>}
+    <div
+      style={{
+        border: `1px solid ${C.dimGreen}`,
+        background: C.black,
+        overflow: "hidden",
+        fontFamily: mono,
+      }}
+    >
+      <div
+        style={{
+          padding: "12px 16px",
+          background: C.black,
+          borderBottom: `1px solid ${C.dimGreen}`,
+        }}
+      >
+        <h3
+          style={{
+            fontFamily: mono,
+            fontSize: "13px",
+            color: C.green,
+            margin: 0,
+            textTransform: "lowercase",
+            letterSpacing: "0.08em",
+          }}
+        >
+          {title}
+        </h3>
+        {description && (
+          <p
+            style={{
+              fontFamily: mono,
+              fontSize: "10px",
+              color: C.dimGreen,
+              margin: "2px 0 0",
+              letterSpacing: "0.05em",
+            }}
+          >
+            {description}
+          </p>
+        )}
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+      <div style={{ overflowX: "auto" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+          }}
+        >
           {children}
         </table>
       </div>
@@ -32,9 +78,13 @@ export function AdminTable({ title, description, children }: AdminTableProps) {
   );
 }
 
-AdminTable.Head = function AdminTableHead({ children }: { children: React.ReactNode }) {
+AdminTable.Head = function AdminTableHead({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <thead className="bg-ink-200">
+    <thead style={{ background: "#010f01" }}>
       <tr>{children}</tr>
     </thead>
   );
@@ -42,47 +92,78 @@ AdminTable.Head = function AdminTableHead({ children }: { children: React.ReactN
 
 AdminTable.HeadCell = function AdminTableHeadCell({
   children,
-  className,
+  style,
 }: {
   children: React.ReactNode;
-  className?: string;
+  style?: React.CSSProperties;
 }) {
   return (
     <th
-      className={cn(
-        'px-4 py-2.5 text-left text-xs font-semibold text-cream-faint uppercase tracking-wider',
-        className
-      )}
+      style={{
+        padding: "10px 16px",
+        textAlign: "left",
+        fontSize: "10px",
+        fontFamily: mono,
+        color: C.cyan,
+        textTransform: "uppercase",
+        letterSpacing: "0.15em",
+        fontWeight: 600,
+        borderBottom: `1px solid ${C.dimGreen}`,
+        whiteSpace: "nowrap",
+        ...style,
+      }}
     >
       {children}
     </th>
   );
 };
 
-AdminTable.Body = function AdminTableBody({ children }: { children: React.ReactNode }) {
-  return <tbody className="divide-y divide-cream/5">{children}</tbody>;
+AdminTable.Body = function AdminTableBody({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <tbody>{children}</tbody>;
 };
 
 AdminTable.Row = function AdminTableRow({
   children,
-  className,
+  style,
 }: {
   children: React.ReactNode;
-  className?: string;
+  style?: React.CSSProperties;
 }) {
   return (
-    <tr className={cn('hover:bg-cream/[0.02] transition-colors', className)}>{children}</tr>
+    <tr
+      style={{
+        borderBottom: `1px solid ${C.dimGreen}`,
+        transition: "background 0.15s",
+        ...style,
+      }}
+    >
+      {children}
+    </tr>
   );
 };
 
 AdminTable.Cell = function AdminTableCell({
   children,
-  className,
+  style,
 }: {
   children: React.ReactNode;
-  className?: string;
+  style?: React.CSSProperties;
 }) {
   return (
-    <td className={cn('px-4 py-3 text-cream-muted', className)}>{children}</td>
+    <td
+      style={{
+        padding: "12px 16px",
+        fontFamily: mono,
+        color: C.dimGreen,
+        verticalAlign: "middle",
+        ...style,
+      }}
+    >
+      {children}
+    </td>
   );
 };

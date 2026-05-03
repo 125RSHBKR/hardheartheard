@@ -1,12 +1,26 @@
 import React from "react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Skull, Coins } from "lucide-react";
 
 export const metadata = {
   title: "Hall of Shame — HardHeartHeard",
   description: "The fallen. Those who ran out of coins. The deceased.",
 };
+
+/* ─── colour tokens ─────────────────────────────────── */
+const C = {
+  green: "#00ff41",
+  cyan: "#00f5ff",
+  pink: "#ff006e",
+  yellow: "#ffe600",
+  red: "#ff0000",
+  dimGreen: "#003b0f",
+  black: "#000000",
+} as const;
+
+const glow = (c: string) => `0 0 8px ${c}, 0 0 20px ${c}`;
+const boxGlow = (c: string) => `0 0 8px ${c}`;
+const mono = "'Share Tech Mono', monospace";
 
 export default async function HallOfShamePage() {
   const shamed = await prisma.hallOfShame.findMany({
@@ -19,92 +33,247 @@ export default async function HallOfShamePage() {
   });
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      {/* Header */}
-      <div className="text-center mb-14">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-blood/40 bg-blood/10 mb-6">
-          <Skull className="h-8 w-8 text-blood animate-flicker" />
+    <div
+      style={{
+        maxWidth: "720px",
+        margin: "0 auto",
+        padding: "48px 16px",
+        fontFamily: mono,
+        background: C.black,
+        minHeight: "100vh",
+      }}
+    >
+      {/* ── header ── */}
+      <div style={{ textAlign: "center", marginBottom: "56px" }}>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "64px",
+            height: "64px",
+            border: `2px solid ${C.red}`,
+            boxShadow: boxGlow(C.red),
+            background: C.black,
+            marginBottom: "24px",
+          }}
+        >
+          <span
+            style={{ fontSize: "28px", color: C.red, textShadow: glow(C.red) }}
+          >
+            ☠
+          </span>
         </div>
-        <h1 className="font-display text-5xl font-black text-cream mb-4 tracking-tight">
-          Hall of Shame
+
+        <h1
+          style={{
+            fontFamily: mono,
+            fontSize: "36px",
+            color: C.red,
+            textShadow: glow(C.red),
+            textTransform: "lowercase",
+            margin: "0 0 16px",
+            letterSpacing: "0.04em",
+          }}
+        >
+          hall of shame
         </h1>
-        <p className="font-serif text-cream-muted italic text-lg max-w-md mx-auto leading-relaxed">
-          Here lie the names of those who spent everything they had —<br />
-          and still it wasn't enough.
+
+        <p
+          style={{
+            fontFamily: mono,
+            fontSize: "13px",
+            color: C.dimGreen,
+            lineHeight: "1.8",
+            maxWidth: "440px",
+            margin: "0 auto 12px",
+          }}
+        >
+          here lie the names of those who spent everything they had —<br />
+          and still it wasn&apos;t enough.
         </p>
-        <div className="mt-4 text-xs text-cream-faint/60 font-sans uppercase tracking-[0.2em]">
+
+        <div
+          style={{
+            fontFamily: mono,
+            fontSize: "10px",
+            color: C.cyan,
+            textShadow: glow(C.cyan),
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+          }}
+        >
           {shamed.length} {shamed.length === 1 ? "soul" : "souls"} departed
         </div>
       </div>
 
-      {/* Decorative rule */}
-      <div className="flex items-center gap-3 mb-10">
-        <div className="flex-1 h-px bg-gradient-to-r from-transparent to-blood/40" />
-        <Skull className="h-4 w-4 text-blood/60" />
-        <div className="flex-1 h-px bg-gradient-to-l from-transparent to-blood/40" />
+      {/* ── divider ── */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "40px",
+        }}
+      >
+        <div
+          style={{ flex: 1, height: "1px", background: C.red, opacity: 0.3 }}
+        />
+        <span style={{ color: C.red, fontSize: "14px" }}>☠</span>
+        <div
+          style={{ flex: 1, height: "1px", background: C.red, opacity: 0.3 }}
+        />
       </div>
 
-      {/* List */}
+      {/* ── list ── */}
       {shamed.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="font-display text-2xl text-cream-faint mb-2">
-            The hall is empty.
+        <div style={{ textAlign: "center", padding: "80px 0" }}>
+          <p
+            style={{
+              fontFamily: mono,
+              fontSize: "20px",
+              color: C.dimGreen,
+              marginBottom: "8px",
+            }}
+          >
+            the hall is empty.
           </p>
-          <p className="font-serif text-cream-faint/60 text-sm italic">
-            Not yet. But it won't stay that way.
+          <p
+            style={{
+              fontFamily: mono,
+              fontSize: "12px",
+              color: C.dimGreen,
+              opacity: 0.6,
+            }}
+          >
+            not yet. but it won&apos;t stay that way.
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {shamed.map((entry: (typeof shamed)[number], index: number) => (
             <div
               key={entry.id}
-              className="group relative flex items-start gap-4 p-5 border border-cream/5 rounded-lg bg-ink-50 hover:border-blood/20 transition-all duration-300"
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "16px",
+                padding: "20px",
+                border: `1px solid ${C.dimGreen}`,
+                background: C.black,
+                borderLeft: `3px solid ${C.red}`,
+                boxShadow: boxGlow(C.red),
+                position: "relative",
+              }}
             >
-              {/* Number */}
-              <div className="flex-shrink-0 w-8 text-center">
-                <span className="text-xs text-cream-faint/40 font-sans tabular-nums">
+              {/* index */}
+              <div
+                style={{ flexShrink: 0, width: "32px", textAlign: "center" }}
+              >
+                <span
+                  style={{
+                    fontFamily: mono,
+                    fontSize: "10px",
+                    color: C.dimGreen,
+                    letterSpacing: "0.05em",
+                  }}
+                >
                   {String(index + 1).padStart(3, "0")}
                 </span>
               </div>
 
-              {/* Avatar */}
-              <div className="flex-shrink-0">
-                <div className="h-12 w-12 rounded-full bg-ink border border-blood/20 flex items-center justify-center overflow-hidden grayscale opacity-60">
-                  {entry.user?.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={entry.user.avatar_url}
-                      alt={entry.display_name}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <Skull className="h-6 w-6 text-blood/40" />
-                  )}
-                </div>
+              {/* avatar */}
+              <div
+                style={{
+                  flexShrink: 0,
+                  width: "48px",
+                  height: "48px",
+                  border: `1px solid ${C.red}`,
+                  background: C.black,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                  filter: "grayscale(100%)",
+                  opacity: 0.6,
+                }}
+              >
+                {entry.user?.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={entry.user.avatar_url}
+                    alt={entry.display_name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <span style={{ color: C.red, fontSize: "20px" }}>☠</span>
+                )}
               </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2 flex-wrap">
+              {/* info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    justifyContent: "space-between",
+                    gap: "8px",
+                    flexWrap: "wrap",
+                  }}
+                >
                   <div>
                     <Link
                       href={`/profile/${entry.username}`}
-                      className="font-display text-lg font-bold text-cream-faint hover:text-blood transition-colors line-through decoration-blood/50"
+                      style={{
+                        fontFamily: mono,
+                        fontSize: "16px",
+                        color: C.dimGreen,
+                        textDecoration: "line-through",
+                        textDecorationColor: C.red,
+                        display: "block",
+                      }}
                     >
                       {entry.display_name}
                     </Link>
-                    <p className="text-xs text-cream-faint/60 mt-0.5">
+                    <span
+                      style={{
+                        fontFamily: mono,
+                        fontSize: "11px",
+                        color: C.dimGreen,
+                        opacity: 0.6,
+                      }}
+                    >
                       @{entry.username}
-                    </p>
+                    </span>
                   </div>
 
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 text-xs text-blood/70">
-                      <Coins className="h-3 w-3" />
-                      <span>Final balance: {entry.final_coin_balance}</span>
+                  <div style={{ textAlign: "right" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        color: C.red,
+                        fontFamily: mono,
+                        fontSize: "11px",
+                      }}
+                    >
+                      <span>¢</span>
+                      <span>final: {entry.final_coin_balance}</span>
                     </div>
-                    <p className="text-xs text-cream-faint/40 mt-0.5">
+                    <p
+                      style={{
+                        fontFamily: mono,
+                        fontSize: "10px",
+                        color: C.dimGreen,
+                        opacity: 0.5,
+                        marginTop: "2px",
+                      }}
+                    >
                       {new Date(entry.banned_at).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
@@ -114,24 +283,37 @@ export default async function HallOfShamePage() {
                   </div>
                 </div>
 
-                <p className="mt-2 text-xs text-cream-faint/60 font-serif italic">
-                  "{entry.reason}"
+                <p
+                  style={{
+                    fontFamily: mono,
+                    fontSize: "11px",
+                    color: C.dimGreen,
+                    marginTop: "8px",
+                    opacity: 0.7,
+                  }}
+                >
+                  &quot;{entry.reason}&quot;
                 </p>
               </div>
-
-              {/* Blood drip accent */}
-              <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blood/0 group-hover:bg-blood/30 transition-all duration-300 rounded-l-lg" />
             </div>
           ))}
         </div>
       )}
 
-      {/* Footer epitaph */}
-      <div className="mt-16 text-center">
-        <p className="font-serif text-cream-faint/40 text-sm italic">
-          "They spent every coin they had.
+      {/* ── footer epitaph ── */}
+      <div style={{ marginTop: "64px", textAlign: "center" }}>
+        <p
+          style={{
+            fontFamily: mono,
+            fontSize: "11px",
+            color: C.dimGreen,
+            opacity: 0.45,
+            lineHeight: "1.8",
+          }}
+        >
+          &quot;they spent every coin they had.
           <br />
-          In the end, silence claimed them."
+          in the end, silence claimed them.&quot;
         </p>
       </div>
     </div>

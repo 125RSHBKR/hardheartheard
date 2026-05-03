@@ -4,14 +4,26 @@ import prisma from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 import { PostCard } from "@/components/PostCard";
 import { CoinBalance } from "@/components/CoinBalance";
-import { Button } from "@/components/ui/button";
-import { User, ExternalLink, MessageSquare, Skull, Coins } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { FeedPost, UserLink } from "@/types";
 
 interface ProfilePageProps {
   params: { username: string };
 }
+
+/* ─── colour tokens ─────────────────────────────────── */
+const C = {
+  green: "#00ff41",
+  cyan: "#00f5ff",
+  pink: "#ff006e",
+  yellow: "#ffe600",
+  red: "#ff0000",
+  dimGreen: "#003b0f",
+  black: "#000000",
+} as const;
+
+const glow = (c: string) => `0 0 8px ${c}, 0 0 20px ${c}`;
+const boxGlow = (c: string) => `0 0 8px ${c}`;
+const mono = "'Share Tech Mono', monospace";
 
 export async function generateMetadata({ params }: ProfilePageProps) {
   const user = await prisma.user.findUnique({
@@ -88,52 +100,126 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const links = (profile.links as unknown as UserLink[]) ?? [];
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      {/* Profile header */}
-      <div className={cn("mb-10", profile.is_banned && "opacity-80")}>
-        <div className="flex items-start gap-5">
-          {/* Avatar */}
-          <div className="relative flex-shrink-0">
-            <div className="h-20 w-20 rounded-full bg-ink-50 border-2 border-cream/20 flex items-center justify-center overflow-hidden">
+    <div
+      style={{
+        maxWidth: "720px",
+        margin: "0 auto",
+        padding: "40px 16px",
+        fontFamily: mono,
+        background: C.black,
+        minHeight: "100vh",
+      }}
+    >
+      {/* ── profile header ── */}
+      <div
+        style={{ marginBottom: "40px", opacity: profile.is_banned ? 0.8 : 1 }}
+      >
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "20px" }}>
+          {/* avatar */}
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <div
+              style={{
+                width: "80px",
+                height: "80px",
+                border: `2px solid ${profile.is_banned ? C.red : C.dimGreen}`,
+                boxShadow: boxGlow(profile.is_banned ? C.red : C.dimGreen),
+                background: C.black,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+            >
               {profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={profile.avatar_url}
                   alt={profile.display_name}
-                  className="h-full w-full object-cover"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    filter: profile.is_banned ? "grayscale(80%)" : "none",
+                  }}
                 />
               ) : (
-                <User className="h-10 w-10 text-cream-faint" />
+                <span style={{ color: C.dimGreen, fontSize: "32px" }}>◈</span>
               )}
             </div>
             {profile.is_banned && (
-              <div className="absolute -bottom-1 -right-1 bg-blood rounded-full p-1">
-                <Skull className="h-3.5 w-3.5 text-cream" />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "-4px",
+                  right: "-4px",
+                  background: C.red,
+                  width: "20px",
+                  height: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "10px",
+                }}
+              >
+                ☠
               </div>
             )}
           </div>
 
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-3 flex-wrap">
+          {/* info */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                gap: "12px",
+                flexWrap: "wrap",
+              }}
+            >
               <div>
                 <h1
-                  className={cn(
-                    "font-display text-2xl font-bold leading-tight",
-                    profile.is_banned
-                      ? "text-cream-faint line-through"
-                      : "text-cream",
-                  )}
+                  style={{
+                    fontFamily: mono,
+                    fontSize: "22px",
+                    color: profile.is_banned ? C.dimGreen : C.pink,
+                    textShadow: profile.is_banned ? "none" : glow(C.pink),
+                    margin: "0 0 2px",
+                    textTransform: "lowercase",
+                    textDecoration: profile.is_banned ? "line-through" : "none",
+                    textDecorationColor: C.red,
+                  }}
                 >
                   {profile.display_name}
                 </h1>
-                <p className="text-cream-faint text-sm">@{profile.username}</p>
+                <p
+                  style={{
+                    fontFamily: mono,
+                    fontSize: "12px",
+                    color: C.dimGreen,
+                    margin: 0,
+                  }}
+                >
+                  @{profile.username}
+                </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
                 {profile.is_banned ? (
-                  <span className="text-xs font-sans text-blood border border-blood/40 px-3 py-1 rounded-sm tracking-widest uppercase">
-                    DECEASED
+                  <span
+                    style={{
+                      fontFamily: mono,
+                      fontSize: "11px",
+                      color: C.red,
+                      border: `1px solid ${C.red}`,
+                      padding: "3px 10px",
+                      textShadow: glow(C.red),
+                      letterSpacing: "0.15em",
+                    }}
+                  >
+                    ☠ DECEASED
                   </span>
                 ) : (
                   <CoinBalance balance={profile.coins} size="md" />
@@ -143,57 +229,95 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   currentUser &&
                   !currentUser.is_banned &&
                   !profile.is_banned && (
-                    <Link href={`/dm/${profile.username}`}>
-                      <Button size="sm" variant="outline" className="gap-1.5">
-                        <MessageSquare className="h-3.5 w-3.5" />
-                        DM
-                      </Button>
+                    <Link
+                      href={`/dm/${profile.username}`}
+                      style={{
+                        fontFamily: mono,
+                        fontSize: "12px",
+                        color: C.cyan,
+                        border: `1px solid ${C.cyan}`,
+                        padding: "4px 12px",
+                        textDecoration: "none",
+                        boxShadow: boxGlow(C.cyan),
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      &gt; dm
                     </Link>
                   )}
               </div>
             </div>
 
-            {/* Bio */}
+            {/* bio */}
             {profile.bio && (
-              <p className="mt-3 font-serif text-sm text-cream-muted leading-relaxed">
+              <p
+                style={{
+                  fontFamily: mono,
+                  fontSize: "12px",
+                  color: C.dimGreen,
+                  marginTop: "12px",
+                  lineHeight: "1.7",
+                }}
+              >
                 {profile.bio}
               </p>
             )}
 
-            {/* Links */}
+            {/* links */}
             {links.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div
+                style={{
+                  marginTop: "10px",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                }}
+              >
                 {links.map((link, i) => (
                   <a
                     key={i}
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-xs text-gold hover:text-gold-light transition-colors"
+                    style={{
+                      fontFamily: mono,
+                      fontSize: "11px",
+                      color: C.yellow,
+                      textDecoration: "none",
+                      textShadow: glow(C.yellow),
+                    }}
                   >
-                    <ExternalLink className="h-3 w-3" />
-                    {link.label}
+                    &gt; {link.label}
                   </a>
                 ))}
               </div>
             )}
 
-            {/* Stats */}
-            <div className="mt-4 flex items-center gap-5 text-xs text-cream-faint">
+            {/* stats */}
+            <div
+              style={{
+                marginTop: "14px",
+                display: "flex",
+                gap: "20px",
+                fontFamily: mono,
+                fontSize: "11px",
+                color: C.dimGreen,
+              }}
+            >
               <span>
-                <span className="text-cream font-semibold">
+                <span style={{ color: C.green, textShadow: glow(C.green) }}>
                   {profile._count.posts}
                 </span>{" "}
                 confessions
               </span>
               <span>
-                <span className="text-cream font-semibold">
+                <span style={{ color: C.green, textShadow: glow(C.green) }}>
                   {profile._count.comments}
                 </span>{" "}
                 responses
               </span>
               <span>
-                Joined{" "}
+                joined{" "}
                 {new Date(profile.created_at).toLocaleDateString("en-US", {
                   month: "long",
                   year: "numeric",
@@ -203,21 +327,52 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </div>
         </div>
 
-        {/* Ban notice */}
+        {/* ban notice */}
         {profile.is_banned && (
-          <div className="mt-6 p-4 border border-blood/30 bg-blood/5 rounded-lg">
-            <div className="flex items-center gap-2 mb-1">
-              <Skull className="h-4 w-4 text-blood" />
-              <span className="text-sm font-semibold text-blood uppercase tracking-wider">
-                Account Deceased
+          <div
+            style={{
+              marginTop: "24px",
+              padding: "16px",
+              border: `1px solid ${C.red}`,
+              borderLeft: `3px solid ${C.red}`,
+              background: C.black,
+              boxShadow: boxGlow(C.red),
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "6px",
+              }}
+            >
+              <span style={{ color: C.red, fontSize: "14px" }}>☠</span>
+              <span
+                style={{
+                  fontFamily: mono,
+                  fontSize: "12px",
+                  color: C.red,
+                  textShadow: glow(C.red),
+                  letterSpacing: "0.15em",
+                }}
+              >
+                ACCOUNT DECEASED
               </span>
             </div>
-            <p className="text-xs text-cream-muted">
-              Reason: {profile.ban_reason || "Coin balance reached zero."}
+            <p
+              style={{
+                fontFamily: mono,
+                fontSize: "11px",
+                color: C.dimGreen,
+                margin: 0,
+              }}
+            >
+              reason: {profile.ban_reason || "coin balance reached zero."}
               {profile.banned_at && (
                 <>
                   {" "}
-                  · Departed {new Date(profile.banned_at).toLocaleDateString()}
+                  · departed {new Date(profile.banned_at).toLocaleDateString()}
                 </>
               )}
             </p>
@@ -225,24 +380,48 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         )}
       </div>
 
-      {/* Posts */}
+      {/* ── posts section ── */}
       <div>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 border-t border-cream/10" />
-          <span className="text-xs text-cream-faint uppercase tracking-widest font-sans">
-            Confessions
+        {/* divider */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            marginBottom: "24px",
+          }}
+        >
+          <div style={{ flex: 1, height: "1px", background: C.dimGreen }} />
+          <span
+            style={{
+              fontFamily: mono,
+              fontSize: "10px",
+              color: C.cyan,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+            }}
+          >
+            confessions
           </span>
-          <div className="flex-1 border-t border-cream/10" />
+          <div style={{ flex: 1, height: "1px", background: C.dimGreen }} />
         </div>
 
         {posts.length === 0 ? (
-          <p className="text-center font-serif text-cream-faint italic py-12">
+          <p
+            style={{
+              textAlign: "center",
+              fontFamily: mono,
+              fontSize: "13px",
+              color: C.dimGreen,
+              padding: "48px 0",
+            }}
+          >
             {profile.is_banned
-              ? "Their words have been silenced."
-              : "No confessions yet."}
+              ? "their words have been silenced."
+              : "no confessions yet."}
           </p>
         ) : (
-          <div className="grid gap-4">
+          <div style={{ display: "grid", gap: "16px" }}>
             {posts.map((post: (typeof posts)[number]) => (
               <PostCard key={post.id} post={post as unknown as FeedPost} />
             ))}
