@@ -1,21 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import prisma from "@/lib/prisma";
 import { deductCoins, postCost } from "@/lib/coins";
 
+/** Resolve the calling user from either a cookie session (web) or Bearer token (Android/API). */
+async function getCallerEmail(req: NextRequest): Promise<string | null> {
+  // 1. Try Bearer token first (Android app)
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const serviceClient = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    );
+    const {
+      data: { user },
+    } = await serviceClient.auth.getUser(token);
+    return user?.email ?? null;
+  }
+  // 2. Fall back to cookie session (browser)
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user?.email ?? null;
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient();
-    const {
-      data: { user: supabaseUser },
-    } = await supabase.auth.getUser();
-
-    if (!supabaseUser?.email) {
+    const email = await getCallerEmail(req);
+    if (!email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const dbUser = await prisma.user.findUnique({
-      where: { email: supabaseUser.email },
+      where: { email },
       select: { id: true, coins: true, is_banned: true },
     });
 
